@@ -1,0 +1,30 @@
+{
+  "name": "crypto-stash-scraper",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "nodemon --watch src --exec ts-node src/index.js",
+    "blockchain": "nodemon --watch src --exec ts-node src/index.js blockchain --config=\"..\\wallets.json\" -R \"*/10 * * * * *\"",
+    "pool": "nodemon --watch src --exec ts-node src/index.js pool --config=\"..\\pools.json\"",
+    "defi": "nodemon --watch src --exec ts-node src/index.js defi --config=\"..\\accounts.json\"",
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Michael May",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^10.0.0",
+    "minimist": "^1.2.5",
+    "node-cron": "^3.0.0",
+    "node-fetch": "^2.6.1",
+    "web3": "^1.4.0"
+  },
+  "devDependencies": {
+    "@types/minimist": "^1.2.2",
+    "@types/node": "^16.0.0",
+    "@types/node-cron": "^2.0.4",
+    "@types/node-fetch": "^2.5.10",
+    "nodemon": "^2.0.9",
+    "ts-node": "^10.0.0",
+    "typescript": "^4.3.5"
+  }
+}
