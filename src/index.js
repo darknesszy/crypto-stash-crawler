@@ -12,11 +12,11 @@ process.on('beforeExit', () => console.log('Cryto Stash scraper exited...'))
 require('util').inspect.defaultOptions.depth = null
 let options
 if(process.env["WALLET_FILE"]) {
-    options = { configs: JSON.parse(readFileSync(process.env["WALLET_FILE"])), type: '-blockchain' }
+    options = { config: JSON.parse(readFileSync(process.env["WALLET_FILE"])), type: '-blockchain' }
 } else if(process.env["POOL_FILE"]) {
-    options = { configs: JSON.parse(readFileSync(process.env["POOL_FILE"])), type: '' }
+    options = { config: JSON.parse(readFileSync(process.env["POOL_FILE"])), type: '' }
 } else if(process.env["ACCOUNT_FILE"]) {
-    options = { configs: JSON.parse(readFileSync(process.env["ACCOUNT_FILE"])), type: '-defi' }
+    options = { config: JSON.parse(readFileSync(process.env["ACCOUNT_FILE"])), type: '-defi' }
 } else {
     options = mainMenu(process.argv.slice(2))
 }
