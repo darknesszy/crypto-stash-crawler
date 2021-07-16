@@ -30,7 +30,8 @@ const run = () => Object.keys(options.config).forEach(key => {
     }
 
     if(request != null) {
-        options.config[key].forEach(el => request.getSync(el))
+        // TODO: This is pseudo sequential, make it proper.
+        options.config[key].forEach((el, i) => setTimeout(() => request.getSync(el), 1000 * i))
     }
 })
 console.log(options)
