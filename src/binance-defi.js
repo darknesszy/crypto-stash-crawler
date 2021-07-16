@@ -100,7 +100,7 @@ export const updateEntry = ({ url, init }, api, converter, isSync) => fetch(url,
 const convertWallets = ({ userId }) => ({ snapshotVos }) => snapshotVos.length > 0 
     && Object.values(
         snapshotVos[0].data.balances.reduce((acc, cur) => {
-            const ticker = cur.asset.slice(cur.asset.length - 3)
+            const ticker = cur.asset.startsWith('LD') ? cur.asset.replace('LD', '') : cur.asset
             acc[ticker] = {
                 asset: ticker,
                 free: acc[ticker] ? acc[ticker].free + Number(cur.free) : Number(cur.free),
