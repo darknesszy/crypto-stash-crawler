@@ -10,14 +10,14 @@ const workerUrl = ({ address }) => new URL(join(`https://stats.ezil.me/current_s
 const payoutUrl = ({ address }) => new URL(join(`https://billing.ezil.me/withdrawals/${address}`))
 
 export const get = wallet => {
-    updateEntry(billingUrl(wallet), 'poolbalances', convertBilling(address))
-    addEntry(workerUrl(wallet), 'hashrates', convertWorker)
-    addEntry(payoutUrl(wallet), `payouts`, convertPayout(address))
+    updateEntry(billingUrl(wallet), 'poolbalances', convertBilling(wallet))
+    addEntry(workerUrl(wallet), 'hashrates', convertWorker(wallet))
+    addEntry(payoutUrl(wallet), `payouts`, convertPayout(wallet))
 }
 
 export const getSync = wallet => Promise.resolve()
     .then(() => updateEntry(billingUrl(wallet), 'poolbalances', convertBilling(wallet), true))
-    .then(() => addEntry(workerUrl(wallet), 'hashrates', convertWorker, true))
+    .then(() => addEntry(workerUrl(wallet), 'hashrates', convertWorker(wallet), true))
     .then(() => addEntry(payoutUrl(wallet), `payouts`, convertPayout(wallet), true))
 
 export const test = wallet => {
@@ -61,7 +61,7 @@ export const addEntry = (url, api, converter, isSync) => fetch(url)
                     }
                 ).then(res => res.status >= 200 && res.status < 300
                     ? console.log(`${api} has been sent...`)
-                    : console.log(`${api}: (${res.status})${res.statusText}`)
+                    : console.log(`sending ${api}: (${res.status})${res.statusText}`)
                 )
             )
         )
@@ -95,7 +95,7 @@ export const updateEntry = (url, api, converter, isSync) => fetch(url)
             )
             .then(res => res.status >= 200 && res.status < 300
                 ? console.log(`${api} updated successfully...`)
-                : console.log(`${api} reported: (${res.status}) ${res.statusText}`)
+                : console.log(`updating ${api} reported: (${res.status}) ${res.statusText}`)
             ),
             Promise.resolve()
         )
@@ -126,16 +126,17 @@ export const updateEntry = (url, api, converter, isSync) => fetch(url)
         )
     )
 
-const convertBilling = ({ coin: mainCoin }) => data => [mainCoin, 'zil']
+const convertBilling = ({ coin: mainCoin, address }) => data => [mainCoin, 'zil']
     .map(coin => ({
         current: data[coin],
         miningPool: {
             name: 'ezilpool'
         },
-        address: data[`${coin}_wallet`]
+        address: address.split('.')[coin == 'zil' ? 1 : 0]
+        // address: data[`${coin}_wallet`]
     }))
 
-const convertWorker = data => data
+const convertWorker = ({ address }) => data => data
     .map(({
         wallet,
         worker,
@@ -150,7 +151,7 @@ const convertWorker = data => data
         reported: reported_hashrate || 0,
         worker: {
             name: worker,
-            address: wallet.split('.')[0],
+            address: address.split('.')[0],
             miningPool: {
                 name: 'ezilpool'
             }
