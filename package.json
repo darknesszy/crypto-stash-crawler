@@ -1,11 +1,12 @@
 {
   "name": "crypto-stash-scraper",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "scripts": {
     "start": "nodemon --watch src --exec ts-node src/index.js",
-    "blockchain": "nodemon --watch src --exec ts-node src/index.js blockchain --config=\"..\\wallets.json\" -R \"*/10 * * * * *\"",
+    "blockchain": "nodemon --watch src --exec ts-node src/index.js blockchain --config=\"..\\wallets.json\"",
     "pool": "nodemon --watch src --exec ts-node src/index.js pool --config=\"..\\pools.json\"",
     "defi": "nodemon --watch src --exec ts-node src/index.js defi --config=\"..\\accounts.json\"",
+    "blockchain:cron": "nodemon --watch src --exec ts-node src/index.js blockchain --config=\"..\\wallets.json\" -R \"*/10 * * * * *\"",
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

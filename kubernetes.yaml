@@ -5,7 +5,7 @@ metadata:
   namespace: crypto-stash
 data:
   api-server: http://localhost:80
-  wallets.json: |
+  pools.json: |
     {
         "ezilpool": [
             { 
@@ -32,12 +32,15 @@ spec:
       containers:
         - name: scraper
           image: registry.cn-shenzhen.aliyuncs.com/destinesiastudio/crypto-stash-scraper:dev
+          imagePullPolicy: Always
           env:
             - name: API_SERVER
               valueFrom:
                 configMapKeyRef:
                   name: scraper-configs
                   key: api-server
+            - name: POOL_FILE
+              value: /configs/pools.json
           volumeMounts:
             - name: scraper-configs
               mountPath: /configs
@@ -73,6 +76,8 @@ spec:
                     configMapKeyRef:
                       name: scraper-configs
                       key: api-server
+                - name: POOL_FILE
+                  value: /configs/pools.json
               volumeMounts:
                 - name: scraper-configs
                   mountPath: /configs

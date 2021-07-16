@@ -15,9 +15,12 @@ RUN npm run build
 # Production Stage
 FROM node:alpine
 
-ENV WALLET_FILE="/configs/wallets.json"
-ENV POOL_FILE="/configs/pools.json"
-ENV ACCOUNT_FILE="/configs/accounts.json"
+# /configs/wallets.json
+ENV WALLET_FILE=""
+# /configs/pools.json
+ENV POOL_FILE=""
+# /configs/accounts.json
+ENV ACCOUNT_FILE=""
 ENV API_SERVER="http://localhost:80"
 ENV ETHERSCAN_KEY=""
 
