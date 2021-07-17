@@ -1,7 +1,7 @@
 import fetch from 'node-fetch'
 import { join } from 'path'
 import { createHmac } from 'crypto'
-import { saveAsFile } from './debug'
+import { readFile, saveAsFile } from './debug'
 
 const apiServer = process.env["API_SERVER"]
 
@@ -15,6 +15,8 @@ const walletsUrl = account => new URL(join(`https://api.binance.com/sapi/v1/acco
 
 const savingsUrl = account => new URL(`https://api.binance.com/sapi/v1/lending/union/account?${signedQuery(account, `type=SPOT&timestamp=${Date.now()}`)}`)
 
+const pricesUrl = account => new URL(`https://api.binance.com/api/v3/ticker/price`)
+
 export const get = account => {
     const init = {
         headers: {
@@ -22,23 +24,35 @@ export const get = account => {
         }
     }
 
-    updateEntry({ url: walletsUrl(account), init: init }, 'accountbalances', convertWallets(account), true)
+    updateCreateEntry({ url: walletsUrl(account), init: init }, 'accountbalances', convertWallets(account), true)
 }
 
-export const getSync = account => Promise.resolve()
-    .then(() => ({
+export const getSync = account => {
+    const init = {
         headers: {
             "X-MBX-APIKEY": account.apiKey
         }
-    }))
-    .then(init => updateEntry({ url: walletsUrl(account), init: init }, 'accountbalances', convertWallets(account), true))
+    }
 
-export const test = account => {
-    // saveAsFile(walletsUrl(account), 'binance-wallets', { headers: { "X-MBX-APIKEY": account.apiKey } })
-    saveAsFile(savingsUrl(account), 'binance-savings', { headers: { "X-MBX-APIKEY": account.apiKey } })
+    return Promise.resolve()
+        .then(() => updateCreateEntry({ url: walletsUrl(account), init }, 'accountbalances', convertWallets(account), true))
+        .then(() =>
+            getList('coins', convertToPrices)
+                .then(coins =>
+                    updateEntry({ url: pricesUrl(account), init }, 'coins', convertPrices(coins), true)    
+                )
+        )
 }
 
-export const updateEntry = ({ url, init }, api, converter, isSync) => fetch(url, init)
+export const test = account => {
+    getList('coins', convertToPrices)
+        .then(coins =>
+            convertPrices(coins)(readFile('binance-prices.json'))
+        )
+        .then(prices => console.log(prices))
+}
+
+export const updateCreateEntry = ({ url, init }, api, converter, isSync) => fetch(url, init)
     .then(res => res.json(), err => { console.error(err); process.exit(5); })
     // .then(data => console.log(api, converter(data)))
     .then(data => isSync
@@ -97,6 +111,48 @@ export const updateEntry = ({ url, init }, api, converter, isSync) => fetch(url,
         )
     )
 
+export const updateEntry = ({ url, init }, api, converter, isSync) => fetch(url, init)
+    .then(res => res.json(), err => { console.error(err); process.exit(5); })
+    // .then(data => console.log(api, converter(data)))
+    .then(data => isSync
+        ? converter(data).reduce((acc, cur) => acc
+            .then(() =>
+                fetch(
+                    `${apiServer}/${api}/${cur.id}`,
+                    {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(cur),
+                    }
+                )
+            )
+            .then(res => res.status >= 200 && res.status < 300
+                ? console.log(`${api} updated successfully...`)
+                : console.log(`${api} reported: (${res.status}) ${res.statusText}`)
+            ),
+            Promise.resolve()
+        )
+        : Promise.all(
+            converter(data).map(model =>
+                fetch(
+                    `${apiUrl}${api}/${model.id}`,
+                    {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(model),
+                    }
+                ).then(res => res.status >= 200 && res.status < 300
+                    ? console.log(`${api} has been sent...`)
+                    : console.log(`${api}: (${res.status})${res.statusText}`)
+                )
+            )
+        )
+    )
+
+export const getList = (api, converter) => fetch(`${apiServer}/${api}`)
+    .then(res => res.json())
+    .then(data => converter(data))
+
 const convertWallets = ({ userId }) => ({ snapshotVos }) => snapshotVos.length > 0 
     && Object.values(
         snapshotVos[0].data.balances.reduce((acc, cur) => {
@@ -136,3 +192,29 @@ const convertSavings = ({ userId }) => ({ positionAmountVos }) => positionAmount
             ticker: asset.toLocaleLowerCase()
         }
     }))
+
+const convertToPrices = coins => coins
+
+const convertPrices = coins => data => coins
+    .map(coin => {
+        const busd = data.find(({ symbol }) => symbol == `${coin.ticker.toUpperCase()}BUSD`)
+        const usdt = data.find(({ symbol }) => symbol == `${coin.ticker.toUpperCase()}USDT`)
+        const btc = data.find(({ symbol }) => symbol == `${coin.ticker.toUpperCase()}BTC`)
+        const eth = data.find(({ symbol }) => symbol == `${coin.ticker.toUpperCase()}ETH`)
+
+        if(busd != null) {
+            coin.usd = busd.price
+        } else if(usdt != null) {
+            coin.usd = usdt.price
+        } else if(btc != null) {
+            const btcPrice = data.find(({ symbol }) => symbol == 'BTCBUSD').price
+            coin.usd = btc.price * btcPrice
+        } else if(eth != null) {
+            const ethPrice = data.find(({ symbol }) => symbol == 'ETHBUSD').price
+            coin.usd = eth.price * ethPrice
+        } else {
+            console.log(`Price for ${coin.ticker} cannot be found.`)
+        }
+
+        return coin
+    })

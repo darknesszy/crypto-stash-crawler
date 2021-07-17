@@ -32,9 +32,12 @@ const run = () => Object.keys(options.config).forEach(key => {
     if(request != null) {
         // TODO: This is pseudo sequential, make it proper.
         options.config[key].forEach((el, i) => setTimeout(() => request.getSync(el), 1000 * i))
+        // options.config[key].forEach((el, i) => setTimeout(() => request.test(el), 1000 * i))
     }
 })
-console.log(options)
+
+console.log(options.cron, options.type)
+
 if(options.cron) {
     if(!cron.validate(options.cron)) {
         console.log('cron expression format is incorrect.')
