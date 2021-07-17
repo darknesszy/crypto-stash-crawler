@@ -9,6 +9,7 @@ export const saveAsFile = async (url, fileName, reqInits) => {
     const res = await fetch(url, reqInits)
 
     try {
+        console.log(res.headers)
         const data = await res.json()
 
         try {
@@ -26,3 +27,8 @@ export const saveAsFile = async (url, fileName, reqInits) => {
 
     console.log(`${fileName || url.hostname}.json has been written...`)
 }
+
+export const readFile = fileName => JSON.parse(fs.readFileSync(
+    join(__dirname, '..', 'logs', fileName),
+    'utf8'
+))
