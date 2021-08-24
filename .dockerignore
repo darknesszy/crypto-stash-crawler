@@ -118,5 +118,4 @@ dist
 .pnp.*
 
 data
-dist
 kubernetes.yaml

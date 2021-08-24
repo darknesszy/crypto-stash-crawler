@@ -69,7 +69,7 @@ spec:
             - name: registry.cn-shenzhen.aliyuncs.com
           containers:
             - name: scraper
-              image: registry.cn-shenzhen.aliyuncs.com/destinesiastudio/crypto-stash-scraper:dev
+              image: registry.cn-shenzhen.aliyuncs.com/destinesiastudio/crypto-stash-scraper:1.0.2
               env:
                 - name: API_SERVER
                   valueFrom:
