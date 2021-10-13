@@ -72,9 +72,9 @@ export const getAccountBalance = _account => Promise.resolve()
         convertAccountBalance(_account)(balances)
             .forEach(balance => Promise.resolve()
                 // Attempt to update stat.
-                .then(() => updateStat('accountbalances', balance))
+                .then(() => updateStats('accountbalances', balance))
                 // When update returns no object found, attempt to create stat.
-                .then(res => res.status == 404 ? createStat('accountbalances', balance) : res)
+                .then(res => res.status == 404 ? createStats('accountbalances', balance) : res)
                 // Print message according to status code.
                 .then(res => res.status >= 200 && res.status < 300
                     ? console.log(`${_api} has been sent...`)
@@ -86,14 +86,22 @@ export const getAccountBalance = _account => Promise.resolve()
 export const getExchangeRates = _account => Promise.resolve()
     .then(() => fetch(`${apiServer}/coins`))
     .then(res => res.json())
-    .then(() => fetch(
-        pricesUrl(_account),
-        {
-            headers: { "X-MBX-APIKEY": _account.apiKey }
-        }
-    ))
-    .then(res => res.json(), err => { console.error(err); process.exit(5); })
-    .then(coins => coins.forEach(coin => updateStat('coins', coin)))
+    .then(coins => 
+        [
+            coins,
+            fetch(
+                pricesUrl(_account),
+                {
+                    headers: { "X-MBX-APIKEY": _account.apiKey }
+                }
+            )
+                .then(res => res.json(), err => { console.error(err); process.exit(5); })
+        ]
+    )
+    .then(([coins, rates]) => 
+        convertPrices(coins)(rates)
+            .forEach(rate => updateStats('coins', rate))
+    )
     // Print message according to status code.
     .then(res => res.status >= 200 && res.status < 300
         ? console.log(`${_api} has been sent...`)
@@ -101,7 +109,7 @@ export const getExchangeRates = _account => Promise.resolve()
     )
 
 
-export const updateStat = (_api, _data) => fetch(
+export const updateStats = (_api, _data) => fetch(
     `${apiServer}/${_api}?coinTicker=${_data.coin.ticker}&userId=${_data.account.userId}`,
     {
         method: 'PUT',
@@ -110,7 +118,7 @@ export const updateStat = (_api, _data) => fetch(
     }
 )
 
-export const createStat = (_api, _data) => fetch(
+export const createStats = (_api, _data) => fetch(
     `${apiServer}/${_api}`,
     {
         method: 'POST',
@@ -235,7 +243,7 @@ const savingsUrl = account => new URL(`https://api.binance.com/sapi/v1/lending/u
 
 const pricesUrl = account => new URL(`https://api.binance.com/api/v3/ticker/price`)
 
-const convertAccountBalance = ({ userId }) => ({ snapshotVos }) => snapshotVos.length > 0
+export const convertAccountBalance = ({ userId }) => ({ snapshotVos }) => snapshotVos.length > 0
     ? Object.values(
         snapshotVos[0].data.balances.reduce((acc, cur) => {
             const ticker = cur.asset.startsWith('LD') ? cur.asset.replace('LD', '') : cur.asset

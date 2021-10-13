@@ -1,20 +1,49 @@
 import dotenv from 'dotenv'
 import { readFileSync } from 'fs'
-import { getAccountBalance } from '../src/binance-defi'
+import { convertAccountBalance, convertPrices } from '../src/binance-defi'
 
 // Setup environment variables.
 !dotenv.config().error && console.log('Using Environment Variables from .env file...')
 
-test("Dummy unit test", () => {
+test("Account balance conversion works", () => {
     // Arrange
-    const accounts = JSON.parse(readFileSync(process.env["ACCOUNT_FILE"]))
+    const binanceAccount = {
+        userId: 555
+    }
+    const data = {
+        "snapshotVos": [
+            {
+                data: {
+                    balances: [
+                        { asset: 'TEST', free: '0.13047', locked: '0' }
+                    ]
+                }
+            }
+        ]
+    }
 
     // Act
-    // convertPricesFunc(data)
-    console.log(getAccountBalance(accounts[0]))
+    const [{ current, account, coin }] = convertAccountBalance(binanceAccount)(data)
 
     // Assert
-    // expect(data).toMatchObject({ 'bianance': {} })
-    // const actual = 1; // not implemented yet
-    // expect(actual).toBe(1);
-});
+    expect(current).toBe(0.13047)
+    expect(account.userId).toBe(555)
+    expect(coin.ticker).toBe('test')
+})
+
+test("Exchange rate conversion works", () => {
+    // Arrange
+    const coins = [
+        { ticker: 'TEST', usd: 0 },
+    ]
+    const rates = [
+        { symbol: 'TESTUSDT', price: '0.01' }
+    ]
+    
+    // Act
+    const [{ ticker, usd }] = convertPrices(coins)(rates)
+
+    // Assert
+    expect(ticker).toBe('TEST')
+    expect(usd).toBe('0.01')
+})
