@@ -10,6 +10,7 @@ export const mainMenu = args => {
 
     const options = {
         cron: parsedArgs['R'] || parsedArgs['cron'],
+        isDryRun: parsedArgs['D'] || parsedArgs['dry-run'],
         concurrent: parsedArgs['U'] || parsedArgs['concurrent']
     }
 
