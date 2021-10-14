@@ -3,7 +3,7 @@ import { join } from 'path'
 import { createHmac } from 'crypto'
 import { readFile, saveAsFile } from './debug'
 
-const apiServer = process.env["API_SERVER"]
+const statsServer = process.env["STATS_SERVER"]
 
 // Get defi data. DEPRECATED
 export const get = _account => {
@@ -84,7 +84,7 @@ export const getAccountBalance = _account => Promise.resolve()
     )
 
 export const getExchangeRates = _account => Promise.resolve()
-    .then(() => fetch(`${apiServer}/coins`))
+    .then(() => fetch(`${statsServer}/coins`))
     .then(res => res.json())
     .then(coins => 
         [
@@ -110,7 +110,7 @@ export const getExchangeRates = _account => Promise.resolve()
 
 
 export const updateStats = (_api, _data) => fetch(
-    `${apiServer}/${_api}?coinTicker=${_data.coin.ticker}&userId=${_data.account.userId}`,
+    `${statsServer}/${_api}?coinTicker=${_data.coin.ticker}&userId=${_data.account.userId}`,
     {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -119,7 +119,7 @@ export const updateStats = (_api, _data) => fetch(
 )
 
 export const createStats = (_api, _data) => fetch(
-    `${apiServer}/${_api}`,
+    `${statsServer}/${_api}`,
     {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -136,7 +136,7 @@ export const updateCreateEntry = ({ url, init }, _api, _convertFunc, _isSync) =>
         ? _convertFunc(data).reduce((acc, cur) => acc
             .then(() =>
                 fetch(
-                    `${apiServer}/${_api}?coinTicker=${cur.coin.ticker}&userId=${cur.account.userId}`,
+                    `${statsServer}/${_api}?coinTicker=${cur.coin.ticker}&userId=${cur.account.userId}`,
                     {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json' },
@@ -146,7 +146,7 @@ export const updateCreateEntry = ({ url, init }, _api, _convertFunc, _isSync) =>
             )
             .then(res => res.status == 404
                 ? fetch(
-                    `${apiServer}/${_api}`,
+                    `${statsServer}/${_api}`,
                     {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -196,7 +196,7 @@ export const updateEntry = ({ url, init }, api, converter, isSync) => fetch(url,
         ? converter(data).reduce((acc, cur) => acc
             .then(() =>
                 fetch(
-                    `${apiServer}/${api}/${cur.id}`,
+                    `${statsServer}/${api}/${cur.id}`,
                     {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json' },
@@ -228,7 +228,7 @@ export const updateEntry = ({ url, init }, api, converter, isSync) => fetch(url,
     )
 
 // DEPRECATED
-export const getCoinTypes = () => fetch(`${apiServer}/coins`)
+export const getCoinTypes = () => fetch(`${statsServer}/coins`)
     .then(res => res.json())
 
 const signQuery = ({ secret }, query) => {

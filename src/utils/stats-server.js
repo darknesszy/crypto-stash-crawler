@@ -1,7 +1,7 @@
 import fetch from 'node-fetch'
 
 export const updateStats = (route, data, params) => fetch(
-    `${process.env["API_SERVER"]}/${route}${params ? paramsToString(params) : ''}`,
+    `${process.env["STATS_SERVER"]}/${route}${params ? paramsToString(params) : ''}`,
     {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -10,7 +10,7 @@ export const updateStats = (route, data, params) => fetch(
 )
 
 export const createStats = (route, data) => fetch(
-    `${process.env["API_SERVER"]}/${route}`,
+    `${process.env["STATS_SERVER"]}/${route}`,
     {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

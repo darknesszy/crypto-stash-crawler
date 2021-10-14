@@ -4,7 +4,7 @@ import { join } from 'path'
 import { saveAsFile } from './debug'
 
 const apiKey = process.env["ETHERSCAN_KEY"]
-const apiServer = process.env["API_SERVER"]
+const statsServer = process.env["STATS_SERVER"]
 
 const balanceUrl = address => new URL(join(`https://api.etherscan.io/api?module=account&action=balance&address=${address}&tag=latest&apikey=${apiKey}`))
 
@@ -26,7 +26,7 @@ export const updateEntry = (url, api, converter, isSync) => fetch(url)
         ? converter(data).reduce((acc, cur) => acc
             .then(() =>
                 fetch(
-                    `${apiServer}/${api}?address=${cur.address}`,
+                    `${statsServer}/${api}?address=${cur.address}`,
                     {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json' },
@@ -36,7 +36,7 @@ export const updateEntry = (url, api, converter, isSync) => fetch(url)
             )
             .then(res => res.status == 404
                 ? fetch(
-                    `${apiServer}/${api}`,
+                    `${statsServer}/${api}`,
                     {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },

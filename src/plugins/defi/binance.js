@@ -27,7 +27,7 @@ export const updateBalance = account => Promise.resolve()
 
 export const updateExchangeRate = account => Promise.all(
     // Get known coin types from stats server.
-    fetch(`${process.env["API_SERVER"]}/coins`)
+    fetch(`${process.env["STATS_SERVER"]}/coins`)
         .then(res => res.json(), err => { console.error(err) }),
     // Get all exchange rate from Binance.
     fetch(

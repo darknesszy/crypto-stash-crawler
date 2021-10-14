@@ -21,7 +21,7 @@ ENV WALLET_FILE=""
 ENV POOL_FILE=""
 # /configs/accounts.json
 ENV ACCOUNT_FILE=""
-ENV API_SERVER="http://localhost:80"
+ENV STATS_SERVER="http://localhost:80"
 ENV ETHERSCAN_KEY=""
 
 RUN mkdir -p /home/node/app/node_modules && chown -R node:node /home/node/app

@@ -2,7 +2,7 @@ import fetch from 'node-fetch'
 import fs from 'fs'
 import { join } from 'path'
 
-const apiServer = process.env["API_SERVER"]
+const statsServer = process.env["STATS_SERVER"]
 
 const billingUrl = ({ address }) => new URL(join(`https://billing.ezil.me/balances/${address}`))
 const hashrateUrl = ({ address }) => new URL(join(`https://stats.ezil.me/current_stats/${address}/reported`))
@@ -36,7 +36,7 @@ export const addEntry = (url, api, converter, isSync) => fetch(url)
         ? converter(data).reduce((acc, cur) => acc
             .then(() =>
                 fetch(
-                    `${apiServer}/${api}`,
+                    `${statsServer}/${api}`,
                     {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -74,7 +74,7 @@ export const updateEntry = (url, api, converter, isSync) => fetch(url)
         ? converter(data).reduce((acc, cur) => acc
             .then(() =>
                 fetch(
-                    `${apiServer}/${api}?address=${cur.address}&poolName=${cur.miningPool.name}`,
+                    `${statsServer}/${api}?address=${cur.address}&poolName=${cur.miningPool.name}`,
                     {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json' },
@@ -84,7 +84,7 @@ export const updateEntry = (url, api, converter, isSync) => fetch(url)
             )
             .then(res => res.status == 404
                 ? fetch(
-                    `${apiServer}/${api}`,
+                    `${statsServer}/${api}`,
                     {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
