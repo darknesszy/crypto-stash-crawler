@@ -25,21 +25,19 @@ export const updateBalance = account => Promise.resolve()
         )
     )
 
-export const updateExchangeRate = account => Promise.all(
-    // Get known coin types from stats server.
-    fetch(`${process.env["STATS_SERVER"]}/coins`)
-        .then(res => res.json(), err => { console.error(err) }),
-    // Get all exchange rate from Binance.
-    fetch(
-        pricesUrl(account),
-        {
-            headers: { "X-MBX-APIKEY": _account.apiKey }
-        }
+// Coin and binance rates can be fetched asynchronously (Limited by VPN switching).
+export const updateExchangeRate = account => Promise.resolve()
+    .then(() => fetch(`${process.env["STATS_SERVER"]}/coins`))
+    .then(res => res.json(), err => { console.error(err) })
+    .then(coins => fetch(
+            pricesUrl(account),
+            {
+                headers: { "X-MBX-APIKEY": account.apiKey }
+            }
+        )
+            .then(res => res.json(), err => { console.error(err); process.exit(5); })
+            .then(prices => PairPricesToCoins(coins, prices))
     )
-        .then(res => res.json(), err => { console.error(err); process.exit(5); })
-)
-    // Assign exchange rate to each coin.
-    .then(([coins, prices]) => PairPricesToCoins(coins, prices))
     .then(coins => coins
         // Attempt to update each coin individually on stats server.
         .forEach(coin => updateStats('coins', coin)

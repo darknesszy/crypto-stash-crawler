@@ -1,4 +1,4 @@
-import { billingToPoolBalanceModel, withdrawalsToPayoutModel, workersToHashrateModel } from '../../../src/plugins/pool/ezil'
+import { billingToPoolBalanceModel, withdrawalsToPayoutModel, workersToHashrateModel } from '../../../src/plugins/pool/ezilpool'
 
 const mockWallet = {
     coin: 'eth',

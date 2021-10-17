@@ -2,7 +2,9 @@ import dotenv from 'dotenv'
 import { readFileSync } from 'fs'
 import cron from 'node-cron'
 import { mainMenu } from './cli'
-import { updateBalances } from './plugins/blockchain'
+// import { updateBalances } from './plugins/blockchain'
+// import { updateBalances, updateHashrates } from './plugins/pool'
+import { updateBalances, updateExchangeRates } from './plugins/defi'
 
 // Setup environment variables.
 !dotenv.config().error && console.log('Using Environment Variables from .env file...')
@@ -13,7 +15,7 @@ process.on('beforeExit', () => console.log('Cryto Stash scraper exited...'))
 // Console.log deep print out objects.
 require('util').inspect.defaultOptions.depth = null
 
-updateBalances()
+updateExchangeRates()
 
 // // Determine code execution method.
 // let options

@@ -9,19 +9,19 @@ export const updateBalances = () => Promise.resolve()
     // Group wallets by the type of blockchain it belongs to.
     .then(wallets => _.groupBy(wallets, el => el.coin.ticker))
     // Asynchronously call grouped blockchain functions.
-    .then(coinGroups => Promise.all(
-        Object.keys(coinGroups)
-        // Filter out blockchains that are not supported yet.
-        .filter(coin => Object.keys(coins).includes(coin))
-        // Execute function for each wallet in the coin group synchronously.
-        .map(coin => coinGroups[coin]
-            .reduce((acc, wallet) => 
-                acc.then(() => coins[coin](wallet.address)),
-                Promise.resolve()
+    .then(coins => Promise.all(
+        Object.keys(coins)
+            // Filter out blockchains that are not supported yet.
+            .filter(coin => Object.keys(coinFuncMap).includes(coin))
+            // Execute function for each wallet in the coin group synchronously.
+            .map(coin => coins[coin]
+                .reduce((acc, wallet) => 
+                    acc.then(() => coinFuncMap[coin](wallet.address)),
+                    Promise.resolve()
+                )
             )
-        )
     ))
 
-const coins = {
+const coinFuncMap = {
     'eth': etherscan
 }
