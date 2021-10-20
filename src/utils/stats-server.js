@@ -5,7 +5,7 @@ export const getCoins = provider => Promise.resolve()
     .then(...jsonOrExit)
     .then(coins => ({
         provider: provider || 'binance',
-        tickers: coins.map(coin => ({ ticker: coin.ticker }))
+        tickers: coins.map(coin => coin.ticker)
     }))
 
 // Get all accounts from stats server.
@@ -13,7 +13,7 @@ export const getDefiAccounts = () => Promise.resolve()
     .then(() => fetch(`${process.env['STATS_SERVER']}/accounts`))
     .then(...jsonOrExit)
     .then(accounts => accounts
-        .map(account => ({ 
+        .map(account => ({
             user: account.userId, 
             provider: account.provider.name,
             auth: JSON.parse(account.authJson)

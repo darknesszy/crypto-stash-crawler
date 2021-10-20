@@ -7,9 +7,31 @@
         {
             "type": "pwa-node",
             "request": "launch",
-            "name": "Launch Program",
+            "name": "Blockchain Command",
             "runtimeArgs": ["--nolazy", "-r", "ts-node/register/transpile-only"],
-            "args": ["src/index.js", "--example", "hello"],
+            "args": ["blockchain", "balance", "--dump=./output"],
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}\\src\\index.js"
+        },
+        {
+            "type": "pwa-node",
+            "request": "launch",
+            "name": "Pool Command",
+            "runtimeArgs": ["--nolazy", "-r", "ts-node/register/transpile-only"],
+            "args": ["pool", "balance", "--dump=./output"],
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}\\src\\index.js"
+        },
+        {
+            "type": "pwa-node",
+            "request": "launch",
+            "name": "Defi Command",
+            "runtimeArgs": ["--nolazy", "-r", "ts-node/register/transpile-only"],
+            "args": ["defi", "exchangerate", "--dump=./output"],
             "skipFiles": [
                 "<node_internals>/**"
             ],

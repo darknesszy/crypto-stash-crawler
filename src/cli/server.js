@@ -1,4 +1,6 @@
-import { createStats, getDefiAccounts, getPoolAccounts, getWallets, printResponse, updateStats } from "../utils/stats-server"
+import { join } from 'path'
+import { createStats, getCoins, getDefiAccounts, getPoolAccounts, getWallets, printResponse, updateStats } from "../utils/stats-server"
+import { saveAsFile } from "./file"
 import { exitWithMsg, validateOptions } from "./menu"
 
 // Get task parameters from stats server.
@@ -37,6 +39,9 @@ const endpoints = {
     commands: {
         blockchain: getWallets,
         pool: getPoolAccounts,
-        defi: getDefiAccounts
+        defi: () => getDefiAccounts()
+            .then(accounts => getCoins()
+                .then(params => ({ ...params, accounts }))
+            )
     }
 }

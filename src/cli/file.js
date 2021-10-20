@@ -6,21 +6,31 @@ const existsAsync = promisify(fs.exists)
 const writeFileAsync = promisify(fs.writeFile)
 const readFileAsync = promisify(fs.readFile)
 
-export const readParams = options => Promise.resolve()
-    .then(() => readJson(options['F'] || options['file']))
-    .then(params => ({
-        ...options,
-        params,
-        output: dumpOutput(
-            options['D'] || options['dump'],
-            Date.now().toString()
-        )
-    }))
+export const readParams = options => validateOptions(options)
+    ? Promise.resolve()
+        .then(() => readJson(options['F'] || options['file']))
+        .then(params => ({
+            ...options,
+            params,
+            output: dumpOutput(
+                options['D'] || options['dump'],
+                Date.now().toString()
+            )
+        }))
+    // No file was provided.
+    : exitWithMsg()
 
 // Send scrapped data to stats server.
 export const dumpOutput = (outputPath, timestamp) => (data, name) => outputPath
     ? saveAsFile(join(outputPath, `${name}_${timestamp}.json`), data)
     : console.log(data)
+
+export const validateOptions = options => options['F'] || options['file']
+
+export const exitWithMsg = () => {
+    console.log(help)
+    process.exit(0)
+}
 
 export const saveAsFile = (filePath, data) => Promise.resolve()
     .then(() => existsAsync(filePath)
@@ -42,3 +52,13 @@ export const appendJson = (path, data) => Promise.resolve()
 
 export const readJson = filePath => readFileAsync(filePath, 'utf8')
     .then(data => JSON.parse(data))
+
+const help = `
+pool: Scrap a mining pool
+wallet: Scrap a wallet
+defi: Scrap a defi API
+
+-R or --cron: Cron job
+-H or --help: Command help
+Use command with --help for specific subcommands
+`
