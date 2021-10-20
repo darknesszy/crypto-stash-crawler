@@ -1,6 +1,6 @@
 import fetch from 'node-fetch'
 import _ from 'lodash'
-import { updateBalance as ezilBalance, updateHashrate as ezilHashrate } from './ezilpool'
+import { readBalance as ezilBalance, readHashrate as ezilHashrate } from './ezilpool'
 
 export const updateBalances = () => Promise.resolve()
     .then(() => getPoolAccounts())

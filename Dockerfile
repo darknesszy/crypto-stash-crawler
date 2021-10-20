@@ -15,14 +15,10 @@ RUN npm run build
 # Production Stage
 FROM node:alpine
 
-# /configs/wallets.json
-ENV WALLET_FILE=""
-# /configs/pools.json
-ENV POOL_FILE=""
-# /configs/accounts.json
-ENV ACCOUNT_FILE=""
 ENV STATS_SERVER="http://localhost:80"
 ENV ETHERSCAN_KEY=""
+ENV BINANCE_KEY=""
+ENV BINANCE_SECRET=""
 
 RUN mkdir -p /home/node/app/node_modules && chown -R node:node /home/node/app
 

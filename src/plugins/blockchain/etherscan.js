@@ -1,19 +1,11 @@
 import fetch from 'node-fetch'
 import web3 from 'web3'
 import { join } from 'path'
-import { createStats, updateStats, printResponse } from '../../utils/stats-server'
 
-export const readBalance = (address) => Promise.resolve()
+export const readBalance = address => Promise.resolve()
     .then(() => fetch(balanceUrl(address)))
-    .then(res => res.json(), err => { console.error(err); process.exit(5); })
+    .then(res => res.json(), err => { console.error(err); process.exit(0); })
     .then(({ result }) => balanceToStats(address, result))
-    .then(wallet => updateStats(`wallets/${wallet.address}`, wallet)
-        .then(res => res.status == 404
-            ? createStats('wallets', wallet)
-            : res
-        )
-    )
-    .then(res => printResponse('wallets', res))
 
 export const balanceToStats = (address, balance) => ({
     coin : {

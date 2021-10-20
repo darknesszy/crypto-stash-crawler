@@ -1,4 +1,4 @@
-import { PairPricesToCoins, snapshotsToAccountBalanceModel } from '../../../src/plugins/defi/binance'
+import { PairPricesToTickers, snapshotsToAccountBalanceModel } from '../../../src/plugins/defi/binance'
 
 const mockAccount = {
     apiKey: '',
@@ -45,7 +45,7 @@ test('Prices can pair with coins', () => {
     ]
 
     // Act
-    const result = PairPricesToCoins(mockCoins, mockPrices)
+    const result = PairPricesToTickers(mockCoins, mockPrices)
 
     // Assert
     expect(Array.isArray(result)).toBeTruthy()
