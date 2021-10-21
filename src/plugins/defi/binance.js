@@ -23,7 +23,7 @@ export const readExchangeRate = tickers => fetch(
 
 // // Coin and binance rates can be fetched asynchronously (Limited by VPN switching).
 // export const updateExchangeRate = account => Promise.resolve()
-//     .then(() => fetch(`${process.env["STATS_SERVER"]}/coins`))
+//     .then(() => fetch(`${process.env["API_SERVER"]}/coins`))
 //     .then(res => res.json(), err => { console.error(err) })
 //     .then(coins => fetch(
 //             pricesUrl(account),

@@ -3,7 +3,7 @@ import { join } from 'path'
 import { createHmac } from 'crypto'
 import { readFile, saveAsFile } from './debug'
 
-const statsServer = process.env["STATS_SERVER"]
+const statsServer = process.env["API_SERVER"]
 
 // Get defi data. DEPRECATED
 export const get = _account => {

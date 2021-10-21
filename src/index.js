@@ -15,7 +15,7 @@ require('util').inspect.defaultOptions.depth = null
 
 const options = minimist(process.argv.slice(2))
 
-process.env['STATS_SERVER'] != null
+process.env['API_SERVER'] != null
     ? fetchParams(options).then(options => runCommand(options))
     // Feed input arguments to menu.
     : readParams(options).then(options => runCommand(options))

@@ -15,7 +15,7 @@ RUN npm run build
 # Production Stage
 FROM node:alpine
 
-ENV STATS_SERVER="http://localhost:80"
+ENV API_SERVER="http://localhost:80"
 ENV ETHERSCAN_KEY=""
 ENV BINANCE_KEY=""
 ENV BINANCE_SECRET=""

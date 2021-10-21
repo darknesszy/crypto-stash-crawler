@@ -4,7 +4,7 @@ import { join } from 'path'
 import { saveAsFile } from './debug'
 
 const apiKey = process.env["ETHERSCAN_KEY"]
-const statsServer = process.env["STATS_SERVER"]
+const statsServer = process.env["API_SERVER"]
 
 const balanceUrl = address => new URL(join(`https://api.etherscan.io/api?module=account&action=balance&address=${address}&tag=latest&apikey=${apiKey}`))
 

@@ -4,7 +4,7 @@ import { updateBalance as binanceBalance, updateExchangeRate as binanceExchangeR
 
 export const updateBalances = () => Promise.resolve()
     // Get all accounts from stats server.
-    .then(() => fetch(`${process.env["STATS_SERVER"]}/accounts`))
+    .then(() => fetch(`${process.env["API_SERVER"]}/accounts`))
     .then(res => res.json(), err => { console.error(err); process.exit(5); })
     // Group accounts by defi provider.
     .then(accounts => _.groupBy(accounts, el => el.provider.name))
@@ -29,7 +29,7 @@ export const updateBalances = () => Promise.resolve()
 
 export const updateExchangeRates = () => Promise.resolve()
     // Get all accounts from stats server.
-    .then(() => fetch(`${process.env["STATS_SERVER"]}/accounts`))
+    .then(() => fetch(`${process.env["API_SERVER"]}/accounts`))
     .then(res => res.json(), err => { console.error(err); process.exit(5); })
     // Select bi
     .then(accounts => accounts.find(account => account.provider.name == 'binance'))

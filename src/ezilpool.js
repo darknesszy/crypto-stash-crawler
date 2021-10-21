@@ -2,7 +2,7 @@ import fetch from 'node-fetch'
 import fs from 'fs'
 import { join } from 'path'
 
-const statsServer = process.env["STATS_SERVER"]
+const statsServer = process.env["API_SERVER"]
 
 const billingUrl = ({ address }) => new URL(join(`https://billing.ezil.me/balances/${address}`))
 const hashrateUrl = ({ address }) => new URL(join(`https://stats.ezil.me/current_stats/${address}/reported`))

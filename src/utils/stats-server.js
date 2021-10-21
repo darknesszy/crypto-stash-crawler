@@ -1,7 +1,7 @@
 import fetch from 'node-fetch'
 
 export const getCoins = provider => Promise.resolve()
-    .then(() => fetch(`${process.env['STATS_SERVER']}/coins`))
+    .then(() => fetch(`${process.env['API_SERVER']}/coins`))
     .then(...jsonOrExit)
     .then(coins => ({
         provider: provider || 'binance',
@@ -10,7 +10,7 @@ export const getCoins = provider => Promise.resolve()
 
 // Get all accounts from stats server.
 export const getDefiAccounts = () => Promise.resolve()
-    .then(() => fetch(`${process.env['STATS_SERVER']}/accounts`))
+    .then(() => fetch(`${process.env['API_SERVER']}/accounts`))
     .then(...jsonOrExit)
     .then(accounts => accounts
         .map(account => ({
@@ -22,7 +22,7 @@ export const getDefiAccounts = () => Promise.resolve()
 
 // Get all the wallets from stats server.
 export const getWallets = () => Promise.resolve()
-    .then(() => fetch(`${process.env['STATS_SERVER']}/wallets`))
+    .then(() => fetch(`${process.env['API_SERVER']}/wallets`))
     .then(...jsonOrExit)
     .then(wallets => wallets
         .map(wallet => ({ 
@@ -34,12 +34,12 @@ export const getWallets = () => Promise.resolve()
 // Get all pool balances from stats server.
 export const getPoolAccounts = () => Promise.resolve()
     // Get all mining pools from stats server.
-    .then(() => fetch(`${process.env['STATS_SERVER']}/miningpools`))
+    .then(() => fetch(`${process.env['API_SERVER']}/miningpools`))
     .then(...jsonOrExit)
     // Get details of each mining pool.
     .then(pools => Promise.all(
         pools.map(pool =>
-            fetch(`${process.env['STATS_SERVER']}/miningpools/${pool.id}`)
+            fetch(`${process.env['API_SERVER']}/miningpools/${pool.id}`)
                 .then(...jsonOrExit)
         )
     ))
@@ -53,7 +53,7 @@ export const getPoolAccounts = () => Promise.resolve()
         ),
         []
     ))
-    .then(pools => fetch(`${process.env['STATS_SERVER']}/wallets`)
+    .then(pools => fetch(`${process.env['API_SERVER']}/wallets`)
         .then(...jsonOrExit)
         .then(wallets => wallets.reduce(
                 (acc, wallet) => ({ ...acc, [wallet.address]: wallet.coin.ticker }),
@@ -67,7 +67,7 @@ export const getPoolAccounts = () => Promise.resolve()
     )
 
 export const updateStats = (route, data, query) => fetch(
-    `${process.env['STATS_SERVER']}/${route}${query ? queryToString(query) : ''}`,
+    `${process.env['API_SERVER']}/${route}${query ? queryToString(query) : ''}`,
     {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -76,7 +76,7 @@ export const updateStats = (route, data, query) => fetch(
 )
 
 export const createStats = (route, data) => fetch(
-    `${process.env['STATS_SERVER']}/${route}`,
+    `${process.env['API_SERVER']}/${route}`,
     {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

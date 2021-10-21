@@ -30,15 +30,15 @@ export const updateHashrates = () => Promise.resolve()
 
 export const getPoolAccounts = () => Promise.resolve()
     // Get all pool balances from stats server.
-    .then(() => fetch(`${process.env["STATS_SERVER"]}/miningpools`))
+    .then(() => fetch(`${process.env["API_SERVER"]}/miningpools`))
     .then(res => res.json(), err => { console.error(err); process.exit(5); })
     .then(pools => Promise.all(
         pools.map(pool => 
-            fetch(`${process.env["STATS_SERVER"]}/miningpools/${pool.id}`)
+            fetch(`${process.env["API_SERVER"]}/miningpools/${pool.id}`)
                 .then(res => res.json(), err => { console.error(err); process.exit(5); })
         )
     ))
-    .then(pools => fetch(`${process.env["STATS_SERVER"]}/wallets`)
+    .then(pools => fetch(`${process.env["API_SERVER"]}/wallets`)
         .then(res => res.json(), err => { console.error(err); process.exit(5); })
         .then(wallets => wallets.reduce((acc, wallet) => ({ ...acc, [wallet.address]: wallet.coin.ticker }), {}))
         .then(addressDict => pools
