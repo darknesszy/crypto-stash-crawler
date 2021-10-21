@@ -1,6 +1,6 @@
 import fetch from 'node-fetch'
 import { join } from 'path'
-import { createStats, updateStats, printResponse } from '../../utils/stats-server'
+import { createStats, printResponse } from '../../utils/stats-server'
 
 // Skip if "ticker: 'zil'" to avoid duplicate (dedupe would remove "ticker: 'eth'" sometimes instead of "ticker: 'zil'")
 export const readBalance = account => account.ticker != 'zil' 
@@ -18,13 +18,8 @@ export const readHashrate = account => account.ticker != 'zil' && Promise.resolv
     .then(res => res.json(), err => { console.error(err); process.exit(5); })
     // Convert worker array to Hashrate array.
     .then(workers => workersToHashrateModel(account, workers))
-    // // Attempt to update Hashrate model on stats server.
-    // .then(hashrates => Promise.all(
-    //     hashrates.map(hashrate => createStats(`hashrates`, hashrate)
-    //         .then(res => printResponse('hashrates', res))
-    //     )
-    // ))
-    
+
+// Need refactoring.
 export const readPayouts = wallet => Promise.resolve()
     // Get withdrawal data from ezil.me page api.
     .then(() => fetch(withdrawalUrl(wallet)))

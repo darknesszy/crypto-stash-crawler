@@ -18,41 +18,6 @@ data:
 ---
 
 apiVersion: batch/v1
-kind: Job
-metadata:
-  name: scraper
-  namespace: crypto-stash
-spec:
-  backoffLimit: 1
-  activeDeadlineSeconds: 30
-  template:
-    spec:
-      imagePullSecrets:
-        - name: registry.cn-shenzhen.aliyuncs.com
-      containers:
-        - name: scraper
-          image: registry.cn-shenzhen.aliyuncs.com/destinesiastudio/crypto-stash-scraper:dev
-          imagePullPolicy: Always
-          env:
-            - name: API_SERVER
-              valueFrom:
-                configMapKeyRef:
-                  name: scraper-configs
-                  key: api-server
-            - name: POOL_FILE
-              value: /configs/pools.json
-          volumeMounts:
-            - name: scraper-configs
-              mountPath: /configs
-      restartPolicy: Never
-      volumes:
-        - name: scraper-configs
-          configMap:
-            name: scraper-configs
-
----
-
-apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: scraper
@@ -69,20 +34,12 @@ spec:
             - name: registry.cn-shenzhen.aliyuncs.com
           containers:
             - name: scraper
-              image: registry.cn-shenzhen.aliyuncs.com/destinesiastudio/crypto-stash-scraper:1.0.2
+              image: registry.cn-shenzhen.aliyuncs.com/destinesiastudio/crypto-stash-scraper:2.0.0
+              args: ["blockchain", "all"]
               env:
                 - name: API_SERVER
                   valueFrom:
                     configMapKeyRef:
-                      name: scraper-configs
-                      key: api-server
-                - name: POOL_FILE
-                  value: /configs/pools.json
-              volumeMounts:
-                - name: scraper-configs
-                  mountPath: /configs
+                      name: staging-configs
+                      key: API_SERVER
           restartPolicy: Never
-          volumes:
-            - name: scraper-configs
-              configMap:
-                name: scraper-configs

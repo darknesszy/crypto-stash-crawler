@@ -1,4 +1,5 @@
 import fetch from 'node-fetch'
+import queryString from 'query-string'
 
 export const getCoins = provider => Promise.resolve()
     .then(() => fetch(`${process.env['API_SERVER']}/coins`))
@@ -14,7 +15,7 @@ export const getDefiAccounts = () => Promise.resolve()
     .then(...jsonOrExit)
     .then(accounts => accounts
         .map(account => ({
-            user: account.userId, 
+            user: account.userId,
             provider: account.provider.name,
             auth: JSON.parse(account.authJson)
         }))
@@ -67,7 +68,7 @@ export const getPoolAccounts = () => Promise.resolve()
     )
 
 export const updateStats = (route, data, query) => fetch(
-    `${process.env['API_SERVER']}/${route}${query ? queryToString(query) : ''}`,
+    `${process.env['API_SERVER']}/${route}?${queryString.stringify(query)}`,
     {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -93,8 +94,3 @@ const jsonOrExit = [
     res => res.json(),
     err => { console.error(err); }
 ]
-
-const queryToString = query => Object.keys(query).reduce(
-    (acc, cur) => acc.concat('&', cur, '=', query[cur]),
-    '?'
-)

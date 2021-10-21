@@ -31,7 +31,7 @@ export const getBalances = (outputFn, accounts) => accounts
                     .then(() => outputFn(
                         balance,
                         'accountbalances',
-                        { coinTicker: balance.coin.ticker, userId: balance.userId }
+                        { coinTicker: balance.coin.ticker, userId: balance.account.userId }
                     )
                 ),
                 Promise.resolve()
@@ -42,7 +42,11 @@ export const getBalances = (outputFn, accounts) => accounts
 export const getExchangeRate = (outputFn, { provider, tickers }) => Promise.resolve()
     .then(() => exchangeRateFnMap[provider](tickers))
     .then(exchangeRates => exchangeRates.reduce(
-        (acc, exchangeRate) => acc.then(() => outputFn(exchangeRate, 'coins')),
+        (acc, exchangeRate) => acc.then(() => outputFn(
+            exchangeRate,
+            'coins',
+            { coinTicker: exchangeRate.ticker }
+        )),
         Promise.resolve()
     ))
 

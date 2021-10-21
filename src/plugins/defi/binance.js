@@ -1,7 +1,6 @@
 import fetch from 'node-fetch'
 import { join } from 'path'
 import { createHmac } from 'crypto'
-import { createStats, updateStats, printResponse } from '../../utils/stats-server'
 
 export const readBalance = account => Promise.resolve()
     // Get account snapshots from Binance.
@@ -20,26 +19,6 @@ export const readExchangeRate = tickers => fetch(
 )
     .then(res => res.json(), err => { console.error(err); process.exit(5); })
     .then(prices => PairPricesToTickers(tickers, prices))
-
-// // Coin and binance rates can be fetched asynchronously (Limited by VPN switching).
-// export const updateExchangeRate = account => Promise.resolve()
-//     .then(() => fetch(`${process.env["API_SERVER"]}/coins`))
-//     .then(res => res.json(), err => { console.error(err) })
-//     .then(coins => fetch(
-//             pricesUrl(account),
-//             {
-//                 headers: { "X-MBX-APIKEY": account.apiKey }
-//             }
-//         )
-//             .then(res => res.json(), err => { console.error(err); process.exit(5); })
-//             .then(prices => PairPricesToCoins(coins, prices))
-//     )
-//     .then(coins => coins
-//         // Attempt to update each coin individually on stats server.
-//         .forEach(coin => updateStats('coins', coin)
-//             .then(res => printResponse('coins', res))
-//         )
-//     )
 
 export const snapshotsToAccountBalanceModel = ({ user }, { snapshotVos }) => snapshotVos.length > 0
     ? Object.values(

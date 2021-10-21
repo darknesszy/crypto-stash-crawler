@@ -26,10 +26,10 @@ WORKDIR /home/node/app
 
 USER node
 
-COPY --from=builder --chown=node:node /build/dist ./src
+COPY --from=builder --chown=node:node /build/dist/src ./src
 
 COPY --from=builder --chown=node:node /build/package*.json ./
 
 RUN npm install --only=prod
 
-CMD [ "node", "src/index.js" ]
+ENTRYPOINT [ "node", "src/index.js" ]
