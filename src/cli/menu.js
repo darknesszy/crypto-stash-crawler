@@ -14,7 +14,7 @@ export const validateOptions = options => options._ != null
 
 // Check if task should run as a cron job.
 export const mapToPlugin = options => options.R || options.cron
-    ? scheduleTask(pluginFn(options))
+    ? scheduleTask(options.R || options.cron, () => pluginFn(options))
     : pluginFn(options)
 
 export const exitWithMsg = () => {
