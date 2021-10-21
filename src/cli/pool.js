@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { readBalance as ezilBalance, readHashrate as ezilHashrate } from '../plugins/pool/ezilpool'
+import { readBalance as ezilBalance, readHashrate as ezilHashrate, readPayout as ezilPayout } from '../plugins/pool/ezilpool'
 
 export const mapToTask = options => validateOptions(options)
     ? runTask(options)
@@ -17,7 +17,8 @@ export const runTask = options => options.params
 
 export const runAll = (outputFn, accounts) => Promise.all([
     getBalances(outputFn, accounts),
-    getHashrates(outputFn, accounts)
+    getHashrates(outputFn, accounts),
+    getPayouts(outputFn, accounts)
 ])
 
 export const getBalances = (outputFn, accounts) => accounts
@@ -55,6 +56,20 @@ export const getHashrates = (outputFn, accounts) => accounts
         Promise.resolve()
     )
 
+export const getPayouts = (outputFn, accounts) => accounts
+    // Filter out pools that are not supported yet.
+    .filter(account => Object.keys(payoutFnMap).includes(account.pool))
+    // Synchronously call pool function for every account.
+    .reduce(
+        (acc, account) => acc
+            .then(() => payoutFnMap[account.pool](account))
+            .then(payouts => payouts && payouts.reduce(
+                (acc, hashrate) => acc.then(() => outputFn(hashrate, 'payouts')),
+                Promise.resolve()
+            )),
+        Promise.resolve()
+    )
+
 const createParams = options => [{
     identifier: options.i || options.identifier,
     ticker: options.t || options.ticker,
@@ -74,7 +89,8 @@ const task = options => options._[1]
 const taskFnMap = {
     all: runAll,
     balance: getBalances,
-    hashrate: getHashrates
+    hashrate: getHashrates,
+    payout: getPayouts
 }
 
 const balanceFnMap = {
@@ -83,6 +99,10 @@ const balanceFnMap = {
 
 const hashrateFnMap = {
     'ezilpool': ezilHashrate
+}
+
+const payoutFnMap = {
+    'ezilpool': ezilPayout
 }
 
 const help = `

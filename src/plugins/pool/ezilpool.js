@@ -20,15 +20,15 @@ export const readHashrate = account => account.ticker != 'zil' && Promise.resolv
     .then(workers => workersToHashrateModel(account, workers))
 
 // Need refactoring.
-export const readPayouts = wallet => Promise.resolve()
+export const readPayout = account => account.ticker != 'zil' && Promise.resolve()
     // Get withdrawal data from ezil.me page api.
-    .then(() => fetch(withdrawalUrl(wallet)))
+    .then(() => fetch(withdrawalUrl(account)))
     .then(res => res.json(), err => { console.error(err); process.exit(5); })
     // Convert withdrawal array to Payout array.
-    .then(withdrawals => withdrawalsToPayoutModel(wallet, withdrawals))
-    // Attempt to update Payout model on stats server.
-    .then(payouts => createStats(`payouts`, payouts))
-    .then(res => printResponse('payouts', res))
+    .then(withdrawals => withdrawalsToPayoutModel(account, withdrawals))
+    // // Attempt to update Payout model on stats server.
+    // .then(payouts => createStats(`payouts`, payouts))
+    // .then(res => printResponse('payouts', res))
 
 
 export const billingToPoolBalanceModel = ({ ticker: mainCoin, identifier }, billing) => [mainCoin, 'zil']

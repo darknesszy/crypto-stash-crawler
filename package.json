@@ -4,7 +4,7 @@
   "scripts": {
     "start": "nodemon --exec ts-node src/index.js",
     "blockchain": "nodemon --watch src --exec ts-node src/index.js blockchain all --file=..\\wallets.json --dump=./output",
-    "pool": "nodemon --watch src --exec ts-node src/index.js pool all",
+    "pool": "nodemon --watch src --exec ts-node src/index.js pool payout --dump=./output",
     "defi": "nodemon --watch src --exec ts-node src/index.js defi balance",
     "pool:cron": "nodemon --watch src --exec ts-node src/index.js pool balance -R \"*/30 * * * * *\"",
     "build": "tsc",
