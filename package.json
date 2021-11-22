@@ -1,5 +1,5 @@
 {
-  "name": "crypto-stash-scraper",
+  "name": "crypto-stash-connect",
   "version": "2.0.0",
   "scripts": {
     "start": "nodemon --exec ts-node src/index.js",
