@@ -1,12 +1,12 @@
-import _ from 'lodash'
+// import _ from 'lodash'
 import { readBalance as etherscanBalance } from '../plugins/blockchain/etherscan'
 
 export const mapToTask = options => validateOptions(options)
     ? runTask(options)
     : exitWithMsg
 
-// Task is known.
 export const validateOptions = options => Object.keys(taskFnMap)
+    // Task is known.
     .includes(task(options))
 
 export const runTask = options => options.params

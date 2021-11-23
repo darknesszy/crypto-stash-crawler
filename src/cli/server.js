@@ -1,18 +1,22 @@
 import { join } from 'path'
+import { getToken } from '../utils/auth'
 import { createStats, getCoins, getDefiAccounts, getPoolAccounts, getWallets, printResponse, updateStats } from "../utils/stats-server"
 import { saveAsFile } from "./file"
 import { exitWithMsg, validateOptions } from "./menu"
 
-// Get task parameters from stats server.
+// Get task parameter from server.
 export const fetchParams = options => Promise.resolve()
-    .then(() => validateOptions(options) 
-        && Object.keys(endpoints.commands).includes(plugin(options))
-        ? paramsFn(options)
-        : exitWithMsg()
+    .then(() => getToken())
+    .then(() => validateOptions(options)
+        // Whether the selected plugin is known.
+        && Object.keys(endpoints.paramsFnMap).includes(plugin(options))
+            ? paramsFn(options)
+            : exitWithMsg()
     )
     .then(params => ({
         ...options,
         params,
+        // CHECK rename to cb.
         output: sendData(
             options['D'] || options['dump'],
             Date.now().toString()
@@ -31,12 +35,14 @@ export const sendData = (outputPath, timestamp) => (data, route, query) => outpu
             )
             .then(res => printResponse(route, res))
 
+// Plugin selected in command.
 const plugin = options => options._[0]
-const paramsFn = options => endpoints.commands[plugin(options)]()
+// Function specified by command.
+const paramsFn = options => endpoints.paramsFnMap[plugin(options)]()
 
 // REST API endpoints mapped to each option condition.
 const endpoints = {
-    commands: {
+    paramsFnMap: {
         blockchain: getWallets,
         pool: getPoolAccounts,
         defi: () => getDefiAccounts()
