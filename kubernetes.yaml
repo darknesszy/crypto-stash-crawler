@@ -9,21 +9,20 @@ data:
     {
         "ezilpool": [
             { 
-                "coin": "eth", 
+                "currency": "eth", 
                 "address": "" 
             }
         ]
     }
 
 ---
-
 apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: scraper
   namespace: crypto-stash
 spec:
-  schedule: "*/10 * * * *"
+  schedule: '*/10 * * * *'
   jobTemplate:
     spec:
       backoffLimit: 1
@@ -35,7 +34,7 @@ spec:
           containers:
             - name: scraper
               image: registry.cn-shenzhen.aliyuncs.com/destinesiastudio/crypto-stash-scraper:2.0.0
-              args: ["blockchain", "all"]
+              args: ['blockchain', 'all']
               env:
                 - name: API_SERVER
                   valueFrom:

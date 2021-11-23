@@ -140,6 +140,6 @@ const payoutFnMap = {
 const help = `
 -F or --file: A json file
 -i or --identifier: Account name used by the pool to identify you
--t or --ticker: The 3 letter ticker symbol of the coin
+-t or --ticker: The 3 letter ticker symbol of the currency
 -p or --pool: The name of the pool
 `

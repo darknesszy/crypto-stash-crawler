@@ -1,10 +1,10 @@
 // import { billingToPoolBalanceModel, withdrawalsToPayoutModel, workersToHashrateModel } from '../../../src/plugins/pool/ezilpool'
 
 test('dummy test', () => {
-    expect(true).toBeTruthy()
+  expect(true).toBeTruthy()
 })
 // const mockWallet = {
-//     coin: 'eth',
+//     currency: 'eth',
 //     // Its ezil pool address for no particular reason.
 //     address: '0xcC22CB1b6625b64e81909456111d76Be6158dfBc'
 // }
@@ -19,7 +19,7 @@ test('dummy test', () => {
 
 //     // Act
 //     const result = billingToPoolBalanceModel(mockWallet, mockBilling)
-    
+
 //     // Assert
 //     expect(Array.isArray(result)).toBeTruthy()
 
@@ -32,15 +32,15 @@ test('dummy test', () => {
 // test('Worker data can transform to Hashrates', () => {
 //     // Arrange
 //     const mockWorker = [
-//         { worker: 'testmachine1', coin: 'eth', current_hashrate: 100964268, average_hashrate: 100299798, last_share_timestamp: 1625402429, reported_hashrate: 100898208 }
+//         { worker: 'testmachine1', currency: 'eth', current_hashrate: 100964268, average_hashrate: 100299798, last_share_timestamp: 1625402429, reported_hashrate: 100898208 }
 //     ]
 
 //     // Act
 //     const result = workersToHashrateModel(mockWallet, mockWorker)
-    
+
 //     // Assert
 //     expect(Array.isArray(result)).toBeTruthy()
-    
+
 //     const [{ current, average, reported, worker }] = result
 //     expect(current).toBe(mockWorker[0].current_hashrate)
 //     expect(average).toBe(mockWorker[0].average_hashrate)
@@ -55,17 +55,17 @@ test('dummy test', () => {
 //     // Arrange
 //     const mockWithdrawals = {
 //         eth: [
-//             { amount: Math.random(0, 10), coin: 'eth', created_at: '2021-06-22T06:00:00Z', address: mockWallet.address }
+//             { amount: Math.random(0, 10), currency: 'eth', created_at: '2021-06-22T06:00:00Z', address: mockWallet.address }
 //         ],
 //         etc: [],
 //         zil: [
-//             { amount: Math.random(0, 100), coin: 'zil', created_at: '2021-06-22T06:00:00Z', address: mockWallet.address }
+//             { amount: Math.random(0, 100), currency: 'zil', created_at: '2021-06-22T06:00:00Z', address: mockWallet.address }
 //         ]
 //     }
-    
+
 //     // Act
 //     const result = withdrawalsToPayoutModel(mockWallet, mockWithdrawals)
-    
+
 //     // Assert
 //     expect(Array.isArray(result)).toBeTruthy()
 

@@ -40,7 +40,7 @@ export const getBalances = (outputFn, accounts) =>
               (balancePromises, balance) =>
                 balancePromises.then(() =>
                   outputFn(balance, 'accountbalances', {
-                    coinTicker: balance.coin.ticker,
+                    currencyTicker: balance.currency.ticker,
                     userId: balance.account.userId,
                   })
                 ),
@@ -57,8 +57,8 @@ export const getExchangeRate = (outputFn, { provider, tickers }) =>
       exchangeRates.reduce(
         (acc, exchangeRate) =>
           acc.then(() =>
-            outputFn(exchangeRate, 'coins', {
-              coinTicker: exchangeRate.ticker,
+            outputFn(exchangeRate, 'currencys', {
+              currencyTicker: exchangeRate.ticker,
             })
           ),
         Promise.resolve()
@@ -139,5 +139,5 @@ const help = `
 -p or --provider: Name of the service
 -a or --apikey: API key for accessing the service (Highly recommend not using CLI for this)
 -s or --secret API secret for accessing the service (Highly recommend not using CLI for this)
--t or --ticker: The 3 letter ticker symbol of the coin
+-t or --ticker: The 3 letter ticker symbol of the currency
 `

@@ -3,29 +3,27 @@ jest.mock('node-fetch')
 import fetch from 'node-fetch'
 
 it('can get wallets', async () => {
-    // Arrange
-    const wallets = [
-        { coin: { ticker: 'eth' }, address: 'aweg;h' },
-        { coin: { ticker: 'eth' }, address: 'bhjkl;h' },
-        { coin: { ticker: 'eth' }, address: 'ok4oghh' },
-        { coin: { ticker: 'zil' }, address: 'zil2w4g;h' }
-    ]
-    fetch.mockResolvedValue({
-        json: () => wallets
-    })
+  // Arrange
+  const wallets = [
+    { currency: { ticker: 'eth' }, address: 'aweg;h' },
+    { currency: { ticker: 'eth' }, address: 'bhjkl;h' },
+    { currency: { ticker: 'eth' }, address: 'ok4oghh' },
+    { currency: { ticker: 'zil' }, address: 'zil2w4g;h' },
+  ]
+  fetch.mockResolvedValue({
+    json: () => wallets,
+  })
 
-    // Act
-    const result = await getWallets('')
+  // Act
+  const result = await getWallets('')
 
-    // Assert
-    expect(result).toStrictEqual({
-        eth: [
-            { coin: { ticker: 'eth' }, address: 'aweg;h' },
-            { coin: { ticker: 'eth' }, address: 'bhjkl;h' },
-            { coin: { ticker: 'eth' }, address: 'ok4oghh' },
-        ],
-        zil: [
-            { coin: { ticker: 'zil' }, address: 'zil2w4g;h' }
-        ]
-    })
+  // Assert
+  expect(result).toStrictEqual({
+    eth: [
+      { currency: { ticker: 'eth' }, address: 'aweg;h' },
+      { currency: { ticker: 'eth' }, address: 'bhjkl;h' },
+      { currency: { ticker: 'eth' }, address: 'ok4oghh' },
+    ],
+    zil: [{ currency: { ticker: 'zil' }, address: 'zil2w4g;h' }],
+  })
 })

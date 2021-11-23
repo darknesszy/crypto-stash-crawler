@@ -1,8 +1,8 @@
 import { join } from 'path'
-import { getToken } from '../utils/auth'
+import { loadToken } from '../utils/auth'
 import {
   createStats,
-  getCoins,
+  getCurrencies,
   getDefiAccounts,
   getPoolAccounts,
   getWallets,
@@ -15,7 +15,7 @@ import { exitWithMsg, validateOptions } from './menu'
 // Get task parameter from server.
 export const fetchParams = options =>
   Promise.resolve()
-    .then(() => getToken())
+    .then(() => loadToken())
     .then(() =>
       validateOptions(options) &&
       // Whether the selected plugin is known.
@@ -54,7 +54,7 @@ const endpoints = {
     pool: getPoolAccounts,
     defi: () =>
       getDefiAccounts().then(accounts =>
-        getCoins().then(params => ({ ...params, accounts }))
+        getCurrencies().then(params => ({ ...params, accounts }))
       ),
   },
 }

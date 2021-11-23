@@ -2,17 +2,17 @@ import fetch from 'node-fetch'
 import queryString from 'query-string'
 import { getToken } from './auth'
 
-export const getCoins = provider =>
+export const getCurrencies = provider =>
   Promise.resolve()
     .then(() =>
-      fetch(`${process.env.API_SERVER}/coins`, {
+      fetch(`${process.env.API_SERVER}/currencys`, {
         headers: { Authorization: `Bearer ${getToken()}` },
       })
     )
     .then(...jsonOrExit)
-    .then(coins => ({
+    .then(currencys => ({
       provider: provider || 'binance',
-      tickers: coins.map(coin => coin.ticker),
+      tickers: currencys.map(currency => currency.ticker),
     }))
 
 // Get all accounts from stats server.
@@ -44,7 +44,7 @@ export const getWallets = () =>
     .then(wallets =>
       wallets.map(wallet => ({
         address: wallet.address,
-        ticker: wallet.coin.ticker,
+        ticker: wallet.currency.ticker,
       }))
     )
 
@@ -90,7 +90,7 @@ export const getPoolAccounts = () =>
           wallets.reduce(
             (acc, wallet) => ({
               ...acc,
-              [wallet.address]: wallet.coin.ticker,
+              [wallet.address]: wallet.currency.ticker,
             }),
             {}
           )
@@ -127,12 +127,17 @@ export const createStats = (route, data) =>
 
 export const printResponse = (route, res) =>
   res.status >= 200 && res.status < 300
-    ? console.log(`${route} has been sent...`)
-    : console.log(`${route}: (${res.status})${res.statusText}`)
+    ? process.stdout.write(`${route} has been sent...\n`)
+    : process.stdout.write(`${route}: (${res.status})${res.statusText}\n`)
 
 // Parse JSON from http response. On error, exit the process.
 const jsonOrExit = [
-  res => res.json(),
+  res => {
+    if (res.status === 200) {
+      return res.json()
+    }
+    throw res.statusText || 'Request Failed'
+  },
   err => {
     console.error(err)
   },

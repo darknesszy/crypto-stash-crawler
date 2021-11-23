@@ -1,4 +1,3 @@
-// import _ from 'lodash'
 import { readBalance as etherscanBalance } from '../plugins/blockchain/etherscan'
 
 export const mapToTask = options =>
@@ -26,10 +25,10 @@ export const getBalances = (outputFn, wallets) =>
   wallets
     // Filter out blockchains that are not supported yet.
     .filter(({ ticker }) => Object.keys(balanceFnMap).includes(ticker))
-    // Execute function for each wallet in the coin group synchronously.
+    // Execute function for each wallet in the currency group synchronously.
     .reduce(
-      (acc, { address, ticker }) =>
-        acc
+      (promises, { address, ticker }) =>
+        promises
           .then(() => balanceFnMap[ticker](address))
           .then(balance =>
             outputFn(balance, 'wallets', {
@@ -54,7 +53,7 @@ const hasParams = options =>
   (options.a || options.address) && (options.t || options.ticker)
 
 const exitWithMsg = () => {
-  console.log(help)
+  process.stdout.write(`${help}\n`)
   process.exit(0)
 }
 
@@ -68,6 +67,6 @@ const taskFnMap = {
 
 const help = `
 -F or --file: A json file
--a or --address: Coin wallet address
--t or --ticker: The 3 letter ticker symbol of the coin
+-a or --address: currency wallet address
+-t or --ticker: The 3 letter ticker symbol of the currency
 `

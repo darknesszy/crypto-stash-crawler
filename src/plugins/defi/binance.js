@@ -20,7 +20,7 @@ export const readBalance = account =>
     // Convert to array of stats server API model.
     .then(snapshots => snapshotsToAccountBalanceModel(account, snapshots))
 
-// Coin and binance rates can be fetched asynchronously (Limited by VPN switching).
+// currency and binance rates can be fetched asynchronously (Limited by VPN switching).
 export const readExchangeRate = tickers =>
   fetch(pricesUrl(process.env.BINANCE_SECRET), {
     headers: { 'X-MBX-APIKEY': process.env.BINANCE_KEY },
@@ -62,7 +62,7 @@ export const snapshotsToAccountBalanceModel = ({ user }, { snapshotVos }) =>
               name: 'binance',
             },
           },
-          coin: {
+          currency: {
             ticker: asset.toLocaleLowerCase(),
           },
         }))
@@ -70,7 +70,7 @@ export const snapshotsToAccountBalanceModel = ({ user }, { snapshotVos }) =>
 
 export const PairPricesToTickers = (tickers, prices) =>
   tickers.map(ticker => {
-    const coin = { ticker }
+    const currency = { ticker }
     const busd = prices.find(
       ({ symbol }) => symbol === `${ticker.toUpperCase()}BUSD`
     )
@@ -85,20 +85,20 @@ export const PairPricesToTickers = (tickers, prices) =>
     )
 
     if (busd != null) {
-      coin.usd = busd.price
+      currency.usd = busd.price
     } else if (usdt != null) {
-      coin.usd = usdt.price
+      currency.usd = usdt.price
     } else if (btc != null) {
       const btcPrice = prices.find(({ symbol }) => symbol === 'BTCBUSD').price
-      coin.usd = btc.price * btcPrice
+      currency.usd = btc.price * btcPrice
     } else if (eth != null) {
       const ethPrice = prices.find(({ symbol }) => symbol === 'ETHBUSD').price
-      coin.usd = eth.price * ethPrice
+      currency.usd = eth.price * ethPrice
     } else {
       process.stdout.write(`Price for ${ticker} cannot be found.\n`)
     }
 
-    return coin
+    return currency
   })
 
 export const signQuery = (secret, query) => {

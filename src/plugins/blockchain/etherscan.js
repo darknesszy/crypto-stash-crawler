@@ -1,5 +1,5 @@
 import fetch from 'node-fetch'
-import web3 from 'web3'
+import { utils } from 'web3'
 import { join } from 'path'
 
 export const readBalance = address =>
@@ -15,11 +15,11 @@ export const readBalance = address =>
     .then(({ result }) => balanceToStats(address, result))
 
 export const balanceToStats = (address, balance) => ({
-  coin: {
+  currency: {
     ticker: 'eth',
   },
   address,
-  balance: web3.utils.fromWei(balance),
+  balance: utils.fromWei(balance),
 })
 
 const balanceUrl = address =>

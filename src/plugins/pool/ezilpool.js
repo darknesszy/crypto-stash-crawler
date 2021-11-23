@@ -53,16 +53,16 @@ export const readPayout = account =>
 // .then(res => printResponse('payouts', res))
 
 export const billingToPoolBalanceModel = (
-  { ticker: mainCoin, identifier },
+  { ticker: maincurrency, identifier },
   billing
 ) =>
-  [mainCoin, 'zil'].map(ticker => ({
+  [maincurrency, 'zil'].map(ticker => ({
     current: billing[ticker],
     miningPool: {
       name: 'ezilpool',
     },
     address: identifier.split('.')[ticker === 'zil' ? 1 : 0],
-    // address: data[`${coin}_wallet`]
+    // address: data[`${currency}_wallet`]
   }))
 
 export const workersToHashrateModel = ({ identifier }, workers) =>
@@ -70,7 +70,7 @@ export const workersToHashrateModel = ({ identifier }, workers) =>
     ({
       // wallet,
       worker,
-      // coin,
+      // currency,
       current_hashrate: current,
       average_hashrate: average,
       // last_share_timestamp,
@@ -90,10 +90,10 @@ export const workersToHashrateModel = ({ identifier }, workers) =>
   )
 
 export const withdrawalsToPayoutModel = (
-  { ticker: mainCoin, identifier },
+  { ticker: maincurrency, identifier },
   withdrawals
 ) =>
-  [mainCoin, 'zil'].map(ticker => ({
+  [maincurrency, 'zil'].map(ticker => ({
     miningPool: {
       name: 'ezilpool',
     },
