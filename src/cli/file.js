@@ -6,52 +6,49 @@ const existsAsync = promisify(fs.exists)
 const writeFileAsync = promisify(fs.writeFile)
 const readFileAsync = promisify(fs.readFile)
 
-export const readParams = options => validateOptions(options)
+export const readParams = options =>
+  validateOptions(options)
     ? Promise.resolve()
-        .then(() => readJson(options['F'] || options['file']))
+        .then(() => readJson(options.F || options.file))
         .then(params => ({
-            ...options,
-            params,
-            output: dumpOutput(
-                options['D'] || options['dump'],
-                Date.now().toString()
-            )
+          ...options,
+          params,
+          output: dumpOutput(options.D || options.dump, Date.now().toString()),
         }))
-    // No file was provided.
-    : exitWithMsg()
+    : // No file was provided.
+      exitWithMsg()
 
 // Send scrapped data to stats server.
-export const dumpOutput = (outputPath, timestamp) => (data, name) => outputPath
+export const dumpOutput = (outputPath, timestamp) => (data, name) =>
+  outputPath
     ? saveAsFile(join(outputPath, `${name}_${timestamp}.json`), data)
-    : console.log(data)
+    : process.stdout.write(`${data}\n`)
 
-export const validateOptions = options => options['F'] || options['file']
+export const validateOptions = options => options.F || options.file
 
 export const exitWithMsg = () => {
-    console.log(help)
-    process.exit(0)
+  process.stdout.write(`${help}\n`)
+  process.exit(0)
 }
 
-export const saveAsFile = (filePath, data) => Promise.resolve()
-    .then(() => existsAsync(filePath)
-        .then(exists => exists
-            ? appendJson(filePath, data)
-            : writeFileAsync(filePath, JSON.stringify([data]))
-        )
+export const saveAsFile = (filePath, data) =>
+  Promise.resolve()
+    .then(() =>
+      existsAsync(filePath).then(exists =>
+        exists
+          ? appendJson(filePath, data)
+          : writeFileAsync(filePath, JSON.stringify([data]))
+      )
     )
-    .then(() => console.log(`dumping data to ${filePath}...`))
+    .then(() => process.stdout.write(`dumping data to ${filePath}...\n`))
 
-export const appendJson = (path, data) => Promise.resolve()
+export const appendJson = (path, data) =>
+  Promise.resolve()
     .then(() => readJson(path))
-    .then(fileData => writeFileAsync(
-        path, 
-        JSON.stringify(
-            [ ...fileData, data ]
-        )
-    ))
+    .then(fileData => writeFileAsync(path, JSON.stringify([...fileData, data])))
 
-export const readJson = filePath => readFileAsync(filePath, 'utf8')
-    .then(data => JSON.parse(data))
+export const readJson = filePath =>
+  readFileAsync(filePath, 'utf8').then(data => JSON.parse(data))
 
 const help = `
 pool: Scrap a mining pool

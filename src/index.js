@@ -5,16 +5,22 @@ import { runCommand } from './cli/menu'
 import { fetchParams } from './cli/server'
 
 // Setup environment variables.
-!dotenv.config().error && console.log('Using Environment Variables from .env file...')
+if (dotenv.config().error === undefined)
+  process.stdout.write('Using Environment Variables from .env file...\n')
 
-console.log('Crypto Stash scraper started...')
-process.on('beforeExit', () => console.log('Cryto Stash scraper exited...'))
+process.stdout.write('Crypto Stash scraper started...\n')
+process.on('beforeExit', () =>
+  process.stdout.write('Cryto Stash scraper exited...\n')
+)
 
 // Console.log deep print out objects.
 require('util').inspect.defaultOptions.depth = null
+
 const options = minimist(process.argv.slice(2))
 
-process.env['API_SERVER'] != null
-    ? fetchParams(options).then(options => runCommand(options))
-    // Feed input arguments to menu.
-    : readParams(options).then(options => runCommand(options))
+if (process.env.API_SERVER !== null) {
+  fetchParams(options).then(_options => runCommand(_options))
+} else {
+  // Feed input arguments to menu.
+  readParams(options).then(_options => runCommand(_options))
+}

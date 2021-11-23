@@ -1,124 +1,139 @@
 import fetch from 'node-fetch'
 import queryString from 'query-string'
-import { accessToken } from './auth'
+import { getToken } from './auth'
 
-export const getCoins = provider => Promise.resolve()
+export const getCoins = provider =>
+  Promise.resolve()
     .then(() =>
-        fetch(
-            `${process.env['API_SERVER']}/coins`,
-            { headers: { Authorization: `Bearer ${accessToken}` } }
-        )
+      fetch(`${process.env.API_SERVER}/coins`, {
+        headers: { Authorization: `Bearer ${getToken()}` },
+      })
     )
     .then(...jsonOrExit)
     .then(coins => ({
-        provider: provider || 'binance',
-        tickers: coins.map(coin => coin.ticker)
+      provider: provider || 'binance',
+      tickers: coins.map(coin => coin.ticker),
     }))
 
 // Get all accounts from stats server.
-export const getDefiAccounts = () => Promise.resolve()
+export const getDefiAccounts = () =>
+  Promise.resolve()
     .then(() =>
-        fetch(
-            `${process.env['API_SERVER']}/accounts`,
-            { headers: { Authorization: `Bearer ${accessToken}` } }
-        )
+      fetch(`${process.env.API_SERVER}/accounts`, {
+        headers: { Authorization: `Bearer ${getToken()}` },
+      })
     )
     .then(...jsonOrExit)
-    .then(accounts => accounts
-        .map(account => ({
-            user: account.userId,
-            provider: account.provider.name,
-            auth: JSON.parse(account.authJson)
-        }))
+    .then(accounts =>
+      accounts.map(account => ({
+        user: account.userId,
+        provider: account.provider.name,
+        auth: JSON.parse(account.authJson),
+      }))
     )
 
 // Get all the wallets from stats server.
-export const getWallets = () => Promise.resolve()
+export const getWallets = () =>
+  Promise.resolve()
     .then(() =>
-        fetch(
-            `${process.env['API_SERVER']}/wallets`,
-            { headers: { Authorization: `Bearer ${accessToken}` } }
-        )
+      fetch(`${process.env.API_SERVER}/wallets`, {
+        headers: { Authorization: `Bearer ${getToken()}` },
+      })
     )
     .then(...jsonOrExit)
-    .then(wallets => wallets
-        .map(wallet => ({
-            address: wallet.address,
-            ticker: wallet.coin.ticker
-        }))
+    .then(wallets =>
+      wallets.map(wallet => ({
+        address: wallet.address,
+        ticker: wallet.coin.ticker,
+      }))
     )
 
 // Get all pool balances from stats server.
-export const getPoolAccounts = () => Promise.resolve()
+export const getPoolAccounts = () =>
+  Promise.resolve()
     // Get all mining pools from stats server.
     .then(() =>
-        fetch(
-            `${process.env['API_SERVER']}/miningpools`,
-            { headers: { Authorization: `Bearer ${accessToken}` } }
-        )
+      fetch(`${process.env.API_SERVER}/miningpools`, {
+        headers: { Authorization: `Bearer ${getToken()}` },
+      })
     )
     .then(...jsonOrExit)
     // Get details of each mining pool.
-    .then(pools => Promise.all(
+    .then(pools =>
+      Promise.all(
         pools.map(pool =>
-            fetch(
-                `${process.env['API_SERVER']}/miningpools/${pool.id}`,
-                { headers: { Authorization: `Bearer ${accessToken}` } }
-            )
-                .then(...jsonOrExit)
+          fetch(`${process.env.API_SERVER}/miningpools/${pool.id}`, {
+            headers: { Authorization: `Bearer ${getToken()}` },
+          }).then(...jsonOrExit)
         )
-    ))
-    .then(pools => pools.reduce(
-        (acc, pool) => acc.concat(
+      )
+    )
+    .then(pools =>
+      pools.reduce(
+        (acc, pool) =>
+          acc.concat(
             pool.poolBalances.map(poolBalance => ({
-                identifier: poolBalance.loginAccount || poolBalance.address,
-                address: poolBalance.address,
-                pool: pool.name
+              identifier: poolBalance.loginAccount || poolBalance.address,
+              address: poolBalance.address,
+              pool: pool.name,
             }))
-        ),
+          ),
         []
-    ))
-    .then(pools => 
-        fetch(
-            `${process.env['API_SERVER']}/wallets`,
-            { headers: { Authorization: `Bearer ${accessToken}` } }
-        )
+      )
+    )
+    .then(pools =>
+      fetch(`${process.env.API_SERVER}/wallets`, {
+        headers: { Authorization: `Bearer ${getToken()}` },
+      })
         .then(...jsonOrExit)
-        .then(wallets => wallets.reduce(
-            (acc, wallet) => ({ ...acc, [wallet.address]: wallet.coin.ticker }),
+        .then(wallets =>
+          wallets.reduce(
+            (acc, wallet) => ({
+              ...acc,
+              [wallet.address]: wallet.coin.ticker,
+            }),
             {}
+          )
         )
-        )
-        .then(addressMap => pools
+        .then(addressMap =>
+          pools
             .filter(pool => addressMap[pool.address] != null)
-            .map(pool => ({ ...pool, ticker: addressMap[pool.address] })
-            ))
+            .map(pool => ({
+              ...pool,
+              ticker: addressMap[pool.address],
+            }))
+        )
     )
 
-export const updateStats = (route, data, query) => fetch(
-    `${process.env['API_SERVER']}/${route}?${queryString.stringify(query)}`,
-    {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
-        body: JSON.stringify(data),
-    }
-)
+export const updateStats = (route, data, query) =>
+  fetch(`${process.env.API_SERVER}/${route}?${queryString.stringify(query)}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${getToken()}`,
+    },
+    body: JSON.stringify(data),
+  })
 
-export const createStats = (route, data) => fetch(
-    `${process.env['API_SERVER']}/${route}`,
-    {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
-        body: JSON.stringify(data),
-    }
-)
+export const createStats = (route, data) =>
+  fetch(`${process.env.API_SERVER}/${route}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${getToken()}`,
+    },
+    body: JSON.stringify(data),
+  })
 
-export const printResponse = (route, res) => res.status >= 200 && res.status < 300
+export const printResponse = (route, res) =>
+  res.status >= 200 && res.status < 300
     ? console.log(`${route} has been sent...`)
     : console.log(`${route}: (${res.status})${res.statusText}`)
 
 // Parse JSON from http response. On error, exit the process.
 const jsonOrExit = [
-    res => res.json(),
-    err => { console.error(err); }
+  res => res.json(),
+  err => {
+    console.error(err)
+  },
 ]

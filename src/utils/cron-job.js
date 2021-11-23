@@ -1,20 +1,22 @@
 import cron from 'node-cron'
 
-export const scheduleTask = (expression, taskFn) => {
-    // Setup cron if options were set.
-    if (!cron.validate(expression)) {
-        console.log('cron expression format is incorrect.')
-        process.exit(0)
-    }
+const scheduleTask = (expression, taskFn) => {
+  // Setup cron if options were set.
+  if (!cron.validate(expression)) {
+    process.stdout.write('cron expression format is incorrect.\n')
+    process.exit(0)
+  }
 
-    console.log(`cron job started with ${expression}...`)
+  process.stdout.write(`cron job started with ${expression}...\n`)
+  taskFn()
+
+  cron.schedule(expression, () => {
+    process.stdout.write(`job triggered - ${new Date().toString()}...\n`)
     taskFn()
-
-    cron.schedule(expression, () => {
-        console.log(`job triggered - ${new Date().toString()}...`)
-        taskFn()
-    })
+  })
 }
+
+export default scheduleTask
 
 // // Setup cron if options were set.
 // if(options.cron) {
