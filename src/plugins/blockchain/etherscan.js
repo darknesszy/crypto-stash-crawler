@@ -16,7 +16,7 @@ export const readBalance = address =>
 
 export const balanceToStats = (address, balance) => ({
   currency: {
-    ticker: 'eth',
+    ticker: 'ETH',
   },
   address,
   balance: utils.fromWei(balance),

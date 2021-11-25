@@ -39,7 +39,7 @@ export const getBalances = (outputFn, wallets) =>
     )
 
 const balanceFnMap = {
-  eth: etherscanBalance,
+  ETH: etherscanBalance,
 }
 
 const createParams = options => [
