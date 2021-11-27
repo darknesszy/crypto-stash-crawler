@@ -1,5 +1,4 @@
 import fetch from 'node-fetch'
-import queryString from 'query-string'
 import { getToken } from './auth'
 
 export const getCurrencies = provider =>
@@ -41,12 +40,6 @@ export const getWallets = () =>
       })
     )
     .then(...jsonOrExit)
-    .then(wallets =>
-      wallets.map(wallet => ({
-        address: wallet.address,
-        ticker: wallet.currency.ticker,
-      }))
-    )
 
 // Get all pool balances from stats server.
 export const getPoolAccounts = () =>
@@ -106,7 +99,7 @@ export const getPoolAccounts = () =>
     )
 
 export const updateStats = (route, data, query) =>
-  fetch(`${process.env.API_SERVER}/${route}?${queryString.stringify(query)}`, {
+  fetch(`${process.env.API_SERVER}/${route}/${query}`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
@@ -114,6 +107,16 @@ export const updateStats = (route, data, query) =>
     },
     body: JSON.stringify(data),
   })
+
+// export const updateStats = (route, data, query) =>
+// fetch(`${process.env.API_SERVER}/${route}?${queryString.stringify(query)}`, {
+//   method: 'PUT',
+//   headers: {
+//     'Content-Type': 'application/json',
+//     Authorization: `Bearer ${getToken()}`,
+//   },
+//   body: JSON.stringify(data),
+// })
 
 export const createStats = (route, data) =>
   fetch(`${process.env.API_SERVER}/${route}`, {

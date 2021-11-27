@@ -2,9 +2,9 @@ import fetch from 'node-fetch'
 import { utils } from 'web3'
 import { join } from 'path'
 
-export const readBalance = address =>
+export const getBalance = wallet =>
   Promise.resolve()
-    .then(() => fetch(balanceUrl(address)))
+    .then(() => fetch(balanceUrl(wallet)))
     .then(
       res => res.json(),
       err => {
@@ -12,17 +12,14 @@ export const readBalance = address =>
         process.exit(0)
       }
     )
-    .then(({ result }) => balanceToStats(address, result))
+    .then(({ result }) => updateBalance(wallet, result))
 
-export const balanceToStats = (address, balance) => ({
-  currency: {
-    ticker: 'ETH',
-  },
-  address,
+export const updateBalance = (wallet, balance) => ({
+  ...wallet,
   balance: utils.fromWei(balance),
 })
 
-const balanceUrl = address =>
+const balanceUrl = ({ address }) =>
   new URL(
     join(
       `https://api.etherscan.io/api?module=account&action=balance&address=${address}&tag=latest&apikey=${process.env.ETHERSCAN_KEY}`

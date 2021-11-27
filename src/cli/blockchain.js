@@ -1,4 +1,4 @@
-import { readBalance as etherscanBalance } from '../plugins/blockchain/etherscan'
+import { getBalance } from '../plugins/blockchain'
 
 export const mapToTask = options =>
   validateOptions(options) ? runTask(options) : exitWithMsg
@@ -19,28 +19,18 @@ const createRunTask = options =>
     : exitWithMsg()
 
 export const runAll = (outputFn, wallets) =>
-  Promise.all([getBalances(outputFn, wallets)])
+  Promise.all([getEachBalance(outputFn, wallets)])
 
-export const getBalances = (outputFn, wallets) =>
+export const getEachBalance = (outputFn, wallets) =>
   wallets
-    // Filter out blockchains that are not supported yet.
-    .filter(({ ticker }) => Object.keys(balanceFnMap).includes(ticker))
     // Execute function for each wallet in the currency group synchronously.
     .reduce(
-      (promises, { address, ticker }) =>
+      (promises, wallet) =>
         promises
-          .then(() => balanceFnMap[ticker](address))
-          .then(balance =>
-            outputFn(balance, 'wallets', {
-              address: balance.address,
-            })
-          ),
+          .then(() => getBalance(wallet.currency.ticker, wallet))
+          .then(balance => outputFn(balance, 'wallets', wallet.id)),
       Promise.resolve()
     )
-
-const balanceFnMap = {
-  ETH: etherscanBalance,
-}
 
 const createParams = options => [
   {
@@ -62,7 +52,7 @@ const taskFn = (options, params, outputFn) =>
 const task = options => options._[1]
 const taskFnMap = {
   all: runAll,
-  balance: getBalances,
+  balance: getEachBalance,
 }
 
 const help = `
