@@ -18,10 +18,15 @@ export const readParams = options =>
     : // No file was provided.
       exitWithMsg()
 
+export const getOutputFn = (options, outputMsgFn) =>
+  options.D || options.dump
+    ? dumpOutput(options.D || options.dump, Date.now().toString())
+    : data => process.stdout.write(`${outputMsgFn(data)}\n`)
+
 // Send scrapped data to stats server.
 export const dumpOutput = (outputPath, timestamp) => (data, name) =>
   outputPath
-    ? saveAsFile(join(outputPath, `${name}_${timestamp}.json`), data)
+    ? saveAsFile(join(outputPath, `${name.join('_')}_${timestamp}.json`), data)
     : process.stdout.write(`${data}\n`)
 
 export const validateOptions = options => options.F || options.file

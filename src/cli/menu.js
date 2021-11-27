@@ -1,7 +1,7 @@
 import scheduleTask from '../utils/cron-job'
-import { mapToTask as blockchainTask } from './blockchain'
-import { mapToTask as poolTask } from './pool'
-import { mapToTask as defiTask } from './defi'
+import { runTask as blockchainTask } from './blockchain'
+import { runTask as poolTask } from './pool'
+import { runTask as defiTask } from './defi'
 
 export const runCommand = options =>
   validateOptions(options) ? mapToPlugin(options) : exitWithMsg()

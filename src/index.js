@@ -1,8 +1,6 @@
 import dotenv from 'dotenv'
 import minimist from 'minimist'
-import { readParams } from './cli/file'
 import { runCommand } from './cli/menu'
-import { fetchParams } from './cli/server'
 
 // Setup environment variables.
 if (dotenv.config().error === undefined)
@@ -16,11 +14,5 @@ process.on('beforeExit', () =>
 // Console.log deep print out objects.
 require('util').inspect.defaultOptions.depth = null
 
-const options = minimist(process.argv.slice(2))
-
-if (process.env.API_SERVER !== null) {
-  fetchParams(options).then(_options => runCommand(_options))
-} else {
-  // Feed input arguments to menu.
-  readParams(options).then(_options => runCommand(_options))
-}
+// Feed input arguments to menu.
+runCommand(minimist(process.argv.slice(2), { string: ['a', 'address'] }))

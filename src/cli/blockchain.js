@@ -1,22 +1,35 @@
 import { getBalance } from '../plugins/blockchain'
+import getServerParams from '../server/blockchain'
+import getServerOutputFn from '../server/output'
+import { getOutputFn as getCliOutputFn } from './file'
+import { loadToken } from '../utils/auth'
 
-export const mapToTask = options =>
-  validateOptions(options) ? runTask(options) : exitWithMsg
+export const runTask = options =>
+  process.env.API_SERVER !== undefined
+    ? runServerParams(options)
+    : runCliParams(options)
+
+export const runServerParams = options =>
+  validateOptions(options)
+    ? Promise.resolve()
+        .then(() => loadToken())
+        .then(() => getServerParams(task(options)))
+        .then(params => taskFn(options, params, getServerOutputFn(options)))
+    : exitWithMsg()
+
+export const runCliParams = options =>
+  validateOptions(options) && hasParams(options)
+    ? taskFn(
+        options,
+        composeParams(options),
+        getCliOutputFn(options, outputMsg(options))
+      )
+    : exitWithMsg()
 
 export const validateOptions = options =>
   Object.keys(taskFnMap)
     // Task is known.
     .includes(task(options))
-
-export const runTask = options =>
-  options.params
-    ? taskFn(options, options.params, options.output)
-    : createRunTask(options)
-
-const createRunTask = options =>
-  hasParams(options)
-    ? taskFn(options, createParams(options), options.output)
-    : exitWithMsg()
 
 export const runAll = (outputFn, wallets) =>
   Promise.all([getEachBalance(outputFn, wallets)])
@@ -32,10 +45,12 @@ export const getEachBalance = (outputFn, wallets) =>
       Promise.resolve()
     )
 
-const createParams = options => [
+const composeParams = options => [
   {
     address: options.a || options.address,
-    ticker: options.t || options.ticker,
+    currency: {
+      ticker: (options.t || options.ticker).toUpperCase(),
+    },
   },
 ]
 
@@ -43,7 +58,7 @@ const hasParams = options =>
   (options.a || options.address) && (options.t || options.ticker)
 
 const exitWithMsg = () => {
-  process.stdout.write(`${help}\n`)
+  process.stdout.write(`${helpMsg}\n`)
   process.exit(0)
 }
 
@@ -55,7 +70,13 @@ const taskFnMap = {
   balance: getEachBalance,
 }
 
-const help = `
+const outputMsg = options => outputMsgMap[task(options)]
+const outputMsgMap = {
+  balance: data =>
+    `${data.address} current balance is ${data.balance} ${data.currency.ticker}`,
+}
+
+const helpMsg = `
 -F or --file: A json file
 -a or --address: currency wallet address
 -t or --ticker: The 3 letter ticker symbol of the currency

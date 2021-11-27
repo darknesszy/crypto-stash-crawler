@@ -1,6 +1,6 @@
 import {
-  balanceToStats,
-  readBalance,
+  updateBalance,
+  getBalance,
 } from '../../../src/plugins/blockchain/etherscan'
 
 jest.mock('../../../src/utils/stats-server', () => ({
@@ -19,10 +19,7 @@ test('Balance can convert to stats model', () => {
   const mockBalance = '859114248074655468'
 
   // Act
-  const { currency, address, balance } = balanceToStats(
-    mockAddress,
-    mockBalance
-  )
+  const { currency, address, balance } = updateBalance(mockAddress, mockBalance)
 
   // Assert
   expect(currency.ticker).toBe('eth')

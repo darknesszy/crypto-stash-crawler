@@ -1,71 +1,42 @@
 import fetch from 'node-fetch'
 import { join } from 'path'
 
-// Skip if "ticker: 'zil'" to avoid duplicate (dedupe would remove "ticker: 'eth'" sometimes instead of "ticker: 'zil'")
-export const readBalance = account =>
-  account.ticker !== 'zil'
-    ? Promise.resolve()
-        // Get billing data from ezil.me page api.
-        .then(() => fetch(billingUrl(account)))
-        .then(
-          res => res.json(),
-          err => {
-            console.error(err)
-            process.exit(5)
-          }
-        )
-        // Convert billing data to PoolBalance model.
-        .then(billing => billingToPoolBalanceModel(account, billing))
-    : Promise.resolve()
+export const getBalance = account =>
+  Promise.resolve()
+    // Get billing data from ezil.me page api.
+    .then(() => fetch(billingUrl(account)))
+    .then(...handleResponse)
+    // Convert billing data to PoolBalance model.
+    .then(billing => billingToBalanceModel(account, billing))
 
-export const readHashrate = account =>
-  account.ticker !== 'zil' &&
+export const getHashRates = account =>
   Promise.resolve()
     // Get worker data from ezil.me page api.
     .then(() => fetch(workerUrl(account)))
-    .then(
-      res => res.json(),
-      err => {
-        console.error(err)
-        process.exit(5)
-      }
-    )
+    .then(...handleResponse)
     // Convert worker array to Hashrate array.
-    .then(workers => workersToHashrateModel(account, workers))
+    .then(workers => workersToHashRateModel(account, workers))
 
 // Need refactoring.
-export const readPayout = account =>
-  account.ticker !== 'zil' &&
+export const getPayouts = account =>
   Promise.resolve()
     // Get withdrawal data from ezil.me page api.
     .then(() => fetch(withdrawalUrl(account)))
-    .then(
-      res => res.json(),
-      err => {
-        console.error(err)
-        process.exit(5)
-      }
-    )
+    .then(...handleResponse)
     // Convert withdrawal array to Payout array.
     .then(withdrawals => withdrawalsToPayoutModel(account, withdrawals))
 // // Attempt to update Payout model on stats server.
 // .then(payouts => createStats(`payouts`, payouts))
 // .then(res => printResponse('payouts', res))
 
-export const billingToPoolBalanceModel = (
-  { ticker: maincurrency, identifier },
-  billing
-) =>
-  [maincurrency, 'zil'].map(ticker => ({
-    current: billing[ticker],
-    miningPool: {
-      name: 'ezilpool',
-    },
-    address: identifier.split('.')[ticker === 'zil' ? 1 : 0],
-    // address: data[`${currency}_wallet`]
+export const billingToBalanceModel = (account, billing) =>
+  account.miningPool.currencies.map(currency => ({
+    miningAccount: account,
+    savings: billing[currency.ticker.toLowerCase()],
+    currency,
   }))
 
-export const workersToHashrateModel = ({ identifier }, workers) =>
+export const workersToHashRateModel = (account, workers) =>
   workers.map(
     ({
       // wallet,
@@ -79,15 +50,45 @@ export const workersToHashrateModel = ({ identifier }, workers) =>
       current: current || 0,
       average: average || 0,
       reported: reported || 0,
-      worker: {
-        name: worker,
-        address: identifier.split('.')[0],
-        miningPool: {
-          name: 'ezilpool',
-        },
-      },
+      miningWorker: findWorker(account, worker),
     })
   )
+
+export const findWorker = (account, name) => {
+  const index = (account.miningWorkers || []).map(el => el.name).indexOf(name)
+  return {
+    ...(index !== -1 && account.miningWorkers[index]),
+    name,
+    miningAccount: {
+      ...account,
+      miningWorkers: [],
+    },
+  }
+}
+
+// export const workersToHashrateModel = ({ identifier }, workers) =>
+//   workers.map(
+//     ({
+//       // wallet,
+//       worker,
+//       // currency,
+//       current_hashrate: current,
+//       average_hashrate: average,
+//       // last_share_timestamp,
+//       reported_hashrate: reported,
+//     }) => ({
+//       current: current || 0,
+//       average: average || 0,
+//       reported: reported || 0,
+//       worker: {
+//         name: worker,
+//         address: identifier.split('.')[0],
+//         miningPool: {
+//           name: 'ezilpool',
+//         },
+//       },
+//     })
+//   )
 
 export const withdrawalsToPayoutModel = (
   { ticker: maincurrency, identifier },
@@ -118,3 +119,15 @@ const workerUrl = ({ identifier }) =>
 
 const withdrawalUrl = ({ identifier }) =>
   new URL(join(`https://billing.ezil.me/withdrawals/${identifier}`))
+
+const handleResponse = [
+  res => {
+    if (res.status === 200) {
+      return res.json()
+    }
+    throw res.statusText || `Request Failed ${res.status}`
+  },
+  err => {
+    throw err
+  },
+]

@@ -4,8 +4,7 @@ import {
   createStats,
   getCurrencies,
   getDefiAccounts,
-  getPoolAccounts,
-  getWallets,
+  getMiningAccounts,
   printResponse,
   updateStats,
 } from '../utils/stats-server'
@@ -39,7 +38,7 @@ const sendData = (data, route, query) =>
   !query
     ? createStats(route, data).then(res => printResponse(route, res))
     : updateStats(route, data, query)
-        .then(res => (res.status === 404 ? createStats(route, data) : res))
+        // .then(res => (res.status === 404 ? createStats(route, data) : res))
         .then(res => printResponse(route, res))
 
 // Plugin selected in command.
@@ -50,8 +49,8 @@ const paramsFn = options => endpoints.paramsFnMap[plugin(options)]()
 // REST API endpoints mapped to each option condition.
 const endpoints = {
   paramsFnMap: {
-    blockchain: getWallets,
-    pool: getPoolAccounts,
+    // blockchain: getWallets,
+    pool: getMiningAccounts,
     defi: () =>
       getDefiAccounts().then(accounts =>
         getCurrencies().then(params => ({ ...params, accounts }))
