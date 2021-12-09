@@ -31,9 +31,6 @@ export const validateOptions = options =>
     // Task is known.
     .includes(task(options))
 
-export const runAll = (outputFn, wallets) =>
-  Promise.all([getEachBalance(outputFn, wallets)])
-
 export const getEachBalance = (outputFn, wallets) =>
   wallets
     // Execute function for each wallet in the currency group synchronously.
@@ -66,7 +63,6 @@ const taskFn = (options, params, outputFn) =>
   taskFnMap[task(options)](outputFn, params)
 const task = options => options._[1]
 const taskFnMap = {
-  all: runAll,
   balance: getEachBalance,
 }
 

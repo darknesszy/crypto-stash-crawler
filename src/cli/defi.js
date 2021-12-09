@@ -12,28 +12,25 @@ export const runTask = options =>
 export const runServerParams = options =>
   validateOptions(options)
     ? Promise.resolve()
-        .then(() => loadToken())
-        .then(() =>
-          getServerParams(task(options), options.p || options.provider)
-        )
-        .then(params => taskFn(options, params, getServerOutputFn(options)))
+      .then(() => loadToken())
+      .then(() =>
+        getServerParams(task(options), (options.p || options.provider).toUpperCase())
+      )
+      .then(params => taskFn(options, params, getServerOutputFn(options)))
     : exitWithMsg()
 
 export const runCliParams = options =>
   validateOptions(options) && hasParams(options)
     ? taskFn(
-        options,
-        composeParams(options),
-        getCliOutputFn(options, outputMsg(options))
-      )
+      options,
+      composeParams(options),
+      getCliOutputFn(options, outputMsg(options))
+    )
     : exitWithMsg()
 
 // Task is known.
 export const validateOptions = options =>
   Object.keys(taskFnMap).includes(task(options))
-
-export const runAll = (outputFn, data) =>
-  Promise.all([getEachBalance(outputFn, data), getExchangeRate(outputFn, data)])
 
 export const getEachBalance = (outputFn, [apiKeys, currencies]) =>
   apiKeys
@@ -86,13 +83,6 @@ export const getServiceExchangeRates = (
       )
     )
 
-const composeAllParams = options => [
-  {
-    ...composeBalanceParams(options)[0],
-    ...composeExchangeRateParams(options)[0],
-  },
-]
-
 const composeBalanceParams = options => [
   [
     {
@@ -117,9 +107,6 @@ const composeExchangeRateParams = options => [
     .map(el => ({ ticker: el.toUpperCase() })),
 ]
 
-const hasAllParams = options =>
-  hasBalanceParams(options) && hasExchangeRateParams(options)
-
 const hasBalanceParams = options =>
   (options.p || options.provider) &&
   (options.a || options.apikey) &&
@@ -139,11 +126,6 @@ const hasParams = options => taskFnMap[task(options)].hasParams(options)
 const composeParams = options => taskFnMap[task(options)].createParams(options)
 const task = options => options._[1]
 const taskFnMap = {
-  all: {
-    hasParams: hasAllParams,
-    createParams: composeAllParams,
-    runFn: runAll,
-  },
   balance: {
     hasParams: hasBalanceParams,
     createParams: composeBalanceParams,

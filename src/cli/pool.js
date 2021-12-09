@@ -30,13 +30,6 @@ export const runCliParams = options =>
 export const validateOptions = options =>
   Object.keys(taskFnMap).includes(task(options))
 
-export const runAll = (outputFn, accounts) =>
-  Promise.all([
-    getEachBalance(outputFn, accounts),
-    getEachHashRates(outputFn, accounts),
-    // getEachPayouts(outputFn, accounts),
-  ])
-
 export const getEachBalance = (outputFn, accounts) =>
   // Sequentially call pool function for every account.
   accounts.reduce(
@@ -125,7 +118,6 @@ const taskFn = (options, params, outputFn) =>
   taskFnMap[task(options)](outputFn, params)
 const task = options => options._[1]
 const taskFnMap = {
-  all: runAll,
   balance: getEachBalance,
   hashrate: getEachHashRates,
   payout: getEachPayouts,

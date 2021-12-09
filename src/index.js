@@ -6,9 +6,9 @@ import { runCommand } from './cli/menu'
 if (dotenv.config().error === undefined)
   process.stdout.write('Using Environment Variables from .env file...\n')
 
-process.stdout.write('Crypto Stash scraper started...\n')
+process.stdout.write('Crypto Stash Connect started...\n')
 process.on('beforeExit', () =>
-  process.stdout.write('Cryto Stash scraper exited...\n')
+  process.stdout.write('Crypto Stash Connect exited...\n')
 )
 
 // Console.log deep print out objects.
