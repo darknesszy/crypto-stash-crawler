@@ -12,20 +12,23 @@ export const runTask = options =>
 export const runServerParams = options =>
   validateOptions(options)
     ? Promise.resolve()
-      .then(() => loadToken())
-      .then(() =>
-        getServerParams(task(options), (options.p || options.provider).toUpperCase())
-      )
-      .then(params => taskFn(options, params, getServerOutputFn(options)))
+        .then(() => loadToken())
+        .then(() =>
+          getServerParams(
+            task(options),
+            (options.p || options.provider).toUpperCase()
+          )
+        )
+        .then(params => taskFn(options, params, getServerOutputFn(options)))
     : exitWithMsg()
 
 export const runCliParams = options =>
   validateOptions(options) && hasParams(options)
     ? taskFn(
-      options,
-      composeParams(options),
-      getCliOutputFn(options, outputMsg(options))
-    )
+        options,
+        composeParams(options),
+        getCliOutputFn(options, outputMsg(options))
+      )
     : exitWithMsg()
 
 // Task is known.
