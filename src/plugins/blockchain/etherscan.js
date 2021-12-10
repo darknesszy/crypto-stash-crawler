@@ -12,12 +12,18 @@ export const getBalance = wallet =>
         process.exit(0)
       }
     )
-    .then(({ result }) => updateBalance(wallet, result))
+    .then(({ result }) => BalanceToWalletBalanceModel(wallet, result))
 
-export const updateBalance = (wallet, balance) => ({
-  ...wallet,
-  balance: utils.fromWei(balance),
+export const BalanceToWalletBalanceModel = (wallet, balance) => ({
+  wallet,
+  currency: wallet.currency,
+  savings: utils.fromWei(balance),
 })
+
+// export const updateBalance = (wallet, balance) => ({
+//   ...wallet,
+//   balance: utils.fromWei(balance),
+// })
 
 const balanceUrl = ({ address }) =>
   new URL(

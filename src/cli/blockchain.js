@@ -38,7 +38,9 @@ export const getEachBalance = (outputFn, wallets) =>
       (promises, wallet) =>
         promises
           .then(() => getBalance(wallet.currency.ticker, wallet))
-          .then(balance => outputFn(balance, 'wallets', wallet.id)),
+          .then(balance =>
+            outputFn(balance, ['wallets', wallet.id, 'balances'])
+          ),
       Promise.resolve()
     )
 
