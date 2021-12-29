@@ -92,12 +92,12 @@ const composeParams = options => [
     identifier: options.a || options.address,
     miningPool: {
       name: (options.p || options.pool).toUpperCase(),
-      currencies: currenciesParam(options),
+      tokens: tokensParam(options),
     },
   },
 ]
 
-const currenciesParam = options =>
+const tokensParam = options =>
   (options.t || options.ticker).includes(',')
     ? (options.t || options.ticker)
         .split(',')

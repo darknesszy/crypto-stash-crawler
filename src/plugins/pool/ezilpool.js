@@ -30,29 +30,31 @@ export const getPayouts = account =>
 // .then(res => printResponse('payouts', res))
 
 export const billingToBalanceModel = (account, billing) =>
-  account.miningPool.currencies.map(currency => ({
+  account.miningPool.tokens.map(token => ({
     miningAccount: account,
-    savings: billing[currency.ticker.toLowerCase()],
-    currency,
+    savings: billing[token.ticker.toLowerCase()],
+    token,
   }))
 
 export const workersToHashRateModel = (account, workers) =>
-  workers.map(
-    ({
-      // wallet,
-      worker,
-      // currency,
-      current_hashrate: current,
-      average_hashrate: average,
-      // last_share_timestamp,
-      reported_hashrate: reported,
-    }) => ({
-      current: current || 0,
-      average: average || 0,
-      reported: reported || 0,
-      miningWorker: findWorker(account, worker),
-    })
-  )
+  workers
+    .filter(worker => worker.coin !== 'zil')
+    .map(
+      ({
+        // wallet,
+        worker,
+        // coin,
+        current_hashrate: current,
+        average_hashrate: average,
+        // last_share_timestamp,
+        reported_hashrate: reported,
+      }) => ({
+        current: current || 0,
+        average: average || 0,
+        reported: reported || 0,
+        miningWorker: findWorker(account, worker),
+      })
+    )
 
 export const findWorker = (account, name) => {
   const index = (account.miningWorkers || []).map(el => el.name).indexOf(name)
@@ -66,37 +68,13 @@ export const findWorker = (account, name) => {
   }
 }
 
-// export const workersToHashrateModel = ({ identifier }, workers) =>
-//   workers.map(
-//     ({
-//       // wallet,
-//       worker,
-//       // currency,
-//       current_hashrate: current,
-//       average_hashrate: average,
-//       // last_share_timestamp,
-//       reported_hashrate: reported,
-//     }) => ({
-//       current: current || 0,
-//       average: average || 0,
-//       reported: reported || 0,
-//       worker: {
-//         name: worker,
-//         address: identifier.split('.')[0],
-//         miningPool: {
-//           name: 'ezilpool',
-//         },
-//       },
-//     })
-//   )
-
 export const withdrawalsToPayoutModel = (
-  { ticker: maincurrency, identifier },
+  { ticker: mainToken, identifier },
   withdrawals
 ) =>
-  [maincurrency, 'zil'].map(ticker => ({
+  [mainToken, 'ZIL'].map(ticker => ({
     miningPool: {
-      name: 'ezilpool',
+      name: 'EZIL',
     },
     address: identifier.split('.')[ticker === 'zil' ? 1 : 0],
     txHash: withdrawals[ticker][0].tx_hash,
