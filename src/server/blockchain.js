@@ -3,13 +3,11 @@ import { getToken } from '../utils/auth'
 
 const getParams = task => paramsFnMap[task]()
 
-const supported = ['ETH']
-
 // Get all the wallets from stats server.
-export const getCurrencyWallets = currency =>
+export const getBlockchainWallets = blockchain =>
   Promise.resolve()
     .then(() =>
-      fetch(`${process.env.API_SERVER}/currencies/${currency.id}/wallets`, {
+      fetch(`${process.env.API_SERVER}/blockchains/${blockchain.id}/wallets`, {
         headers: { Authorization: `Bearer ${getToken()}` },
       })
     )
@@ -17,27 +15,24 @@ export const getCurrencyWallets = currency =>
     .then(wallets =>
       wallets.map(wallet => ({
         ...wallet,
-        currency,
+        blockchain,
       }))
     )
 
 export const getWallets = () =>
   Promise.resolve()
     .then(() =>
-      fetch(`${process.env.API_SERVER}/currencies`, {
+      fetch(`${process.env.API_SERVER}/blockchains`, {
         headers: { Authorization: `Bearer ${getToken()}` },
       })
     )
     .then(...handleResponse)
-    .then(currencies =>
-      currencies.filter(currency => supported.includes(currency.ticker))
-    )
-    .then(currencies =>
+    .then(blockchains =>
       Promise.all(
-        currencies.map(currency => getCurrencyWallets(currency))
-      ).then(currenciesWallet =>
-        currenciesWallet.reduce(
-          (wallets, currencyWallets) => [...wallets, ...currencyWallets],
+        blockchains.map(blockchain => getBlockchainWallets(blockchain))
+      ).then(blockchainsWallet =>
+        blockchainsWallet.reduce(
+          (wallets, blockchainWallets) => [...wallets, ...blockchainWallets],
           []
         )
       )

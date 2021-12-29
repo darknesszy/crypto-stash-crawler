@@ -16,7 +16,7 @@ export const getBalance = wallet =>
 
 export const BalanceToWalletBalanceModel = (wallet, balance) => ({
   wallet,
-  currency: wallet.currency,
+  token: wallet.blockchain.nativeToken,
   savings: utils.fromWei(balance),
 })
 

@@ -6,10 +6,10 @@ import { loadToken } from '../utils/auth'
 
 export const runTask = options =>
   process.env.API_SERVER !== undefined
-    ? runServerParams(options)
-    : runCliParams(options)
+    ? runWithServerParams(options)
+    : runWithCliParams(options)
 
-export const runServerParams = options =>
+export const runWithServerParams = options =>
   validateOptions(options)
     ? Promise.resolve()
         .then(() => loadToken())
@@ -17,7 +17,7 @@ export const runServerParams = options =>
         .then(params => taskFn(options, params, getServerOutputFn(options)))
     : exitWithMsg()
 
-export const runCliParams = options =>
+export const runWithCliParams = options =>
   validateOptions(options) && hasParams(options)
     ? taskFn(
         options,
@@ -37,7 +37,7 @@ export const getEachBalance = (outputFn, wallets) =>
     .reduce(
       (promises, wallet) =>
         promises
-          .then(() => getBalance(wallet.currency.ticker, wallet))
+          .then(() => getBalance(wallet.blockchain.nativeToken.ticker, wallet))
           .then(balance =>
             outputFn(balance, ['wallets', wallet.id, 'balances'])
           ),
