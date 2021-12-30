@@ -1,8 +1,7 @@
 import fetch from 'node-fetch'
-import { join } from 'path'
 import { createHmac } from 'crypto'
 
-export const getBalance = (apiKey, currencies) =>
+export const getBalance = (apiKey, tokens) =>
   Promise.resolve()
     // Get account snapshots from Binance.
     .then(() =>
@@ -13,51 +12,50 @@ export const getBalance = (apiKey, currencies) =>
     .then(...handleResponse)
     // Convert to array of stats server API model.
     .then(snapshots =>
-      snapshotsToAccountBalanceModel(
-        apiKey.exchangeAccount,
-        currencies,
-        snapshots
-      )
+      snapshotsToAccountBalanceModel(apiKey.exchangeAccount, tokens, snapshots)
     )
 
 // currency and binance rates can be fetched asynchronously (Limited by VPN switching).
-export const getExchangeRate = (currencyExchange, currencies) =>
+export const getExchangeRate = (currencyExchange, tokens) =>
   fetch(pricesUrl(process.env.BINANCE_SECRET), {
     headers: { 'X-MBX-APIKEY': process.env.BINANCE_KEY },
   })
     .then(...handleResponse)
     .then(prices =>
-      PairPricesToTickers(currencyExchange, currencies, PriceDict(prices))
+      PairPricesToTickers(currencyExchange, tokens, PriceDict(prices))
     )
+
+export const combineBalances = balances =>
+  balances.reduce((dict, balance) => {
+    const ticker = balance.asset.startsWith('LD')
+      ? balance.asset.replace('LD', '')
+      : balance.asset
+    return {
+      ...dict,
+      [ticker]: {
+        asset: ticker,
+        free: dict[ticker]
+          ? dict[ticker].free + Number(balance.free)
+          : Number(balance.free),
+        locked: dict[ticker]
+          ? dict[ticker].locked + Number(balance.locked)
+          : Number(balance.locked),
+      },
+    }
+  }, {})
 
 export const snapshotsToAccountBalanceModel = (
   exchangeAccount,
-  currencies,
+  tokens,
   { snapshotVos }
 ) =>
   snapshotVos.length > 0
-    ? Object.values(
-        snapshotVos[0].data.balances.reduce((acc, cur) => {
-          const ticker = cur.asset.startsWith('LD')
-            ? cur.asset.replace('LD', '')
-            : cur.asset
-          acc[ticker] = {
-            asset: ticker,
-            free: acc[ticker]
-              ? acc[ticker].free + Number(cur.free)
-              : Number(cur.free),
-            locked: acc[ticker]
-              ? acc[ticker].locked + Number(cur.locked)
-              : Number(cur.locked),
-          }
-          return acc
-        }, {})
-      )
+    ? Object.values(combineBalances(snapshotVos[0].data.balances))
         .filter(({ free, locked }) => free !== 0 || locked !== 0)
-        // Filter out Currencies that doesn't exist in database. Probably shouldn't add new currencies here.
+        // Filter out Tokens that doesn't exist in database. Probably shouldn't add new currencies here.
         .filter(
           ({ asset }) =>
-            currencies.map(el => el.ticker).indexOf(asset.toUpperCase()) !== -1
+            tokens.map(el => el.ticker).indexOf(asset.toUpperCase()) !== -1
         )
         .map(({ asset, free }) => ({
           savings: free,
@@ -65,18 +63,16 @@ export const snapshotsToAccountBalanceModel = (
             ...exchangeAccount,
             exchangeAccountApiKey: { publicKey: '', privateKey: '' },
           },
-          currency:
-            currencies[
-              currencies.map(el => el.ticker).indexOf(asset.toUpperCase())
-            ],
+          token:
+            tokens[tokens.map(el => el.ticker).indexOf(asset.toUpperCase())],
         }))
     : []
 
-export const PairPricesToTickers = (currencyExchange, currencies, prices) =>
-  currencies.reduce(
+export const PairPricesToTickers = (currencyExchange, tokens, prices) =>
+  tokens.reduce(
     (rates, buyerCurrency) => [
       ...rates,
-      ...currencies.reduce(
+      ...tokens.reduce(
         (innerRates, sellerCurrency) =>
           prices[buyerCurrency.ticker + sellerCurrency.ticker]
             ? [
@@ -103,47 +99,6 @@ export const PriceDict = prices =>
     }),
     {}
   )
-// export const PairPricesToTickers = (currencyExchange, currencies, prices) =>
-//   currencies.reduce((rates, currency) => {
-//     const currency = {}
-//     const busd = prices.find(
-//       ({ symbol }) => symbol === `${ticker.toUpperCase()}BUSD`
-//     )
-//     const usdt = prices.find(
-//       ({ symbol }) => symbol === `${ticker.toUpperCase()}USDT`
-//     )
-//     const btc = prices.find(
-//       ({ symbol }) => symbol === `${ticker.toUpperCase()}BTC`
-//     )
-//     const eth = prices.find(
-//       ({ symbol }) => symbol === `${ticker.toUpperCase()}ETH`
-//     )
-
-//     if (busd != null) {
-//       currency.usd = busd.price
-//     } else if (usdt != null) {
-//       currency.usd = usdt.price
-//     } else if (btc != null) {
-//       const btcPrice = prices.find(({ symbol }) => symbol === 'BTCBUSD').price
-//       currency.usd = btc.price * btcPrice
-//     } else if (eth != null) {
-//       const ethPrice = prices.find(({ symbol }) => symbol === 'ETHBUSD').price
-//       currency.usd = eth.price * ethPrice
-//     } else {
-//       process.stdout.write(`Price for ${ticker} cannot be found.\n`)
-//     }
-
-//     return [
-//       ...rates,
-//       prices.reduce(())
-//       {
-//         current: 0.1,
-//         buyerCurrency: currency,
-//         sellerCurrency: currencies.map(el => el.ticker).indexOf(),
-//         currencyExchange,
-//       }
-//     ]
-//   }, [])
 
 export const signQuery = (secret, query) => {
   const hmac = createHmac('sha256', secret)
@@ -153,12 +108,10 @@ export const signQuery = (secret, query) => {
 
 const snapshotUrl = secret =>
   new URL(
-    join(
-      `https://api.binance.com/sapi/v1/accountSnapshot?${signQuery(
-        secret,
-        `type=SPOT&timestamp=${Date.now()}`
-      )}`
-    )
+    `https://api.binance.com/sapi/v1/accountSnapshot?${signQuery(
+      secret,
+      `type=SPOT&timestamp=${Date.now()}&recvWindow=10000`
+    )}`
   )
 
 // const accountUrl = secret =>

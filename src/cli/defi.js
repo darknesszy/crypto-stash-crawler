@@ -35,7 +35,7 @@ export const runCliParams = options =>
 export const validateOptions = options =>
   Object.keys(taskFnMap).includes(task(options))
 
-export const getEachBalance = (outputFn, [apiKeys, currencies]) =>
+export const getEachBalance = (outputFn, [apiKeys, tokens]) =>
   apiKeys
     // Synchronously call defi function for every account.
     .reduce(
@@ -45,7 +45,7 @@ export const getEachBalance = (outputFn, [apiKeys, currencies]) =>
             getBalance(
               apiKey.exchangeAccount.currencyExchange.name,
               apiKey,
-              currencies
+              tokens
             )
           )
           .then(balances =>
@@ -64,13 +64,10 @@ export const getEachBalance = (outputFn, [apiKeys, currencies]) =>
       Promise.resolve()
     )
 
-export const getServiceExchangeRates = (
-  outputFn,
-  [currencyExchange, currencies]
-) =>
+export const getServiceExchangeRates = (outputFn, [currencyExchange, tokens]) =>
   Promise.resolve()
     .then(() =>
-      getExchangeRate(currencyExchange.name, currencyExchange, currencies)
+      getExchangeRate(currencyExchange.name, currencyExchange, tokens)
     )
     .then(exchangeRates =>
       exchangeRates.reduce(

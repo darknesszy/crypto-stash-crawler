@@ -22,24 +22,14 @@ export const getCurrencyExchange = provider =>
       )
     )
 
-export const getCurrencies = () =>
+export const getTokens = () =>
   Promise.resolve()
     .then(() =>
-      fetch(`${process.env.API_SERVER}/currencies`, {
+      fetch(`${process.env.API_SERVER}/tokens`, {
         headers: { Authorization: `Bearer ${getToken()}` },
       })
     )
     .then(...handleResponse)
-
-// // Get all accounts from stats server.
-// export const getDefiAccounts = () =>
-//   Promise.resolve()
-//     .then(() =>
-//       fetch(`${process.env.API_SERVER}/exchangeaccounts`, {
-//         headers: { Authorization: `Bearer ${getToken()}` },
-//       })
-//     )
-//     .then(...handleResponse)
 
 // Parse JSON from http response. On error, exit the process.
 const handleResponse = [
@@ -56,9 +46,9 @@ const handleResponse = [
 
 // REST API endpoints mapped to each option condition.
 const paramsFnMap = {
-  balance: () => Promise.all([getApiKeys(), getCurrencies()]),
+  balance: () => Promise.all([getApiKeys(), getTokens()]),
   exchangerate: provider =>
-    Promise.all([getCurrencyExchange(provider), getCurrencies()]),
+    Promise.all([getCurrencyExchange(provider), getTokens()]),
 }
 
 export default getParams
