@@ -70,17 +70,17 @@ export const snapshotsToAccountBalanceModel = (
 
 export const PairPricesToTickers = (currencyExchange, tokens, prices) =>
   tokens.reduce(
-    (rates, buyerCurrency) => [
+    (rates, buyerToken) => [
       ...rates,
       ...tokens.reduce(
-        (innerRates, sellerCurrency) =>
-          prices[buyerCurrency.ticker + sellerCurrency.ticker]
+        (innerRates, sellerToken) =>
+          prices[buyerToken.ticker + sellerToken.ticker]
             ? [
                 ...innerRates,
                 {
-                  current: prices[buyerCurrency.ticker + sellerCurrency.ticker],
-                  buyerCurrency,
-                  sellerCurrency,
+                  current: prices[buyerToken.ticker + sellerToken.ticker],
+                  buyerToken,
+                  sellerToken,
                   currencyExchange,
                 },
               ]

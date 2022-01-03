@@ -16,6 +16,7 @@ RUN npm run build
 FROM node:alpine
 
 ENV API_SERVER="http://localhost:80"
+ENV ID_URL="https://localhost:443"
 ENV ETHERSCAN_KEY=""
 ENV BINANCE_KEY=""
 ENV BINANCE_SECRET=""

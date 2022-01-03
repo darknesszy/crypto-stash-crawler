@@ -7,7 +7,7 @@
     {
       "type": "pwa-node",
       "request": "launch",
-      "name": "Explorer Command",
+      "name": "Blockchain Command",
       "runtimeArgs": ["--nolazy", "-r", "ts-node/register/transpile-only"],
       "args": ["blockchain", "balance"],
       "skipFiles": ["<node_internals>/**"],
